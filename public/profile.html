@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Назяд - Профіль</title>
+  <link rel="stylesheet" href="css/profile.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+  <!-- Верхній футер -->
+  <div class="top-header">
+    <div class="header-left">
+      <a href="javascript:history.back()" class="back-btn" id="backBtn">←</a>
+      <a href="javascript:history.back()" class="logo">Назад</a>
+    </div>
+    <div class="header-icons">
+      <a href="#" id="cartBtn"><i class="fas fa-shopping-cart"></i></a>
+      <a href="#" id="notificationsBtn"><i class="fas fa-bell"></i></a>
+      <div class="avatar-small" id="profileBtn"></div>
+    </div>
+  </div>
+
+  <!-- Основний контент з прокруткою -->
+  <div class="scroll-container">
+    <div class="container">
+      <div class="profile-header">
+        <h1 class="profile-title">Інформація про аккаунт</h1>
+      </div>
+
+      <div class="profile-content">
+        <div class="avatar-large"></div>
+        <button class="edit-profile-btn" id="editProfileBtn">Редагувати</button>
+        <div id="user-info" class="user-info">
+          <span class="info-row"><strong>Телефон:</strong> <span id="phoneValue">Не вказано</span></span>
+          <span class="info-row"><strong>Email:</strong> <span id="emailValue">Не вказано</span></span>
+          <span class="info-row"><strong>Ім'я:</strong> <span id="nameValue">Не вказано</span></span>
+        </div>
+      </div>
+
+      <ul class="menu-list">
+        <li class="menu-item" id="subscriptionsBtn">
+          <i class="fas fa-crown menu-icon"></i>
+          <span>Підписки</span>
+          <i class="fas fa-chevron-right"></i>
+        </li>
+        <li class="menu-item" id="promoCodeBtn">
+          <i class="fas fa-tag menu-icon"></i>
+          <span>Промо код</span>
+          <i class="fas fa-chevron-right"></i>
+        </li>
+        <li class="menu-item" id="ordersBtn">
+          <i class="fas fa-history menu-icon"></i>
+          <span>Замовлення</span>
+          <i class="fas fa-chevron-right"></i>
+        </li>
+        <li class="menu-item" id="walletsBtn">
+          <i class="fas fa-wallet menu-icon"></i>
+          <span>Ваші гаманці</span>
+          <i class="fas fa-chevron-right"></i>
+        </li>
+        <li class="menu-item" id="favoritesBtn">
+          <i class="fas fa-heart menu-icon"></i>
+          <span>Улюблені страви</span>
+          <i class="fas fa-chevron-right"></i>
+        </li>
+      </ul>
+
+      <button onclick="logout()" class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Вийти
+      </button>
+    </div>
+  </div>
+
+  <!-- Модальні вікна -->
+  <div class="modal" id="editProfileModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeEditModal">&times;</span>
+      <h2>Редагування профілю</h2>
+      <form id="profileForm">
+        <div class="form-group">
+          <label for="name">Ім'я</label>
+          <input type="text" id="name" name="name" placeholder="Введіть ваше ім'я" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="Введіть ваш email" required>
+        </div>
+        <div class="form-group">
+          <label for="phone">Телефон</label>
+          <input type="tel" id="phone" name="phone" placeholder="Введіть ваш телефон" required>
+        </div>
+        <button type="submit" class="save-btn">Зберегти зміни</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal" id="subscriptionsModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeSubscriptionsModal">&times;</span>
+      <h2>Ваші підписки</h2>
+      <div class="modal-list" id="subscriptionsList">
+        <!-- Will be populated by JS -->
+      </div>
+      <button class="save-btn" style="width: 100%; margin-top: 20px;">Купити підписку</button>
+    </div>
+  </div>
+
+  <div class="modal" id="ordersModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeOrdersModal">&times;</span>
+      <h2>Історія замовлень</h2>
+      <div class="modal-list" id="ordersList">
+        <!-- Will be populated by JS -->
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="walletsModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeWalletsModal">&times;</span>
+      <h2>Ваші гаманці</h2>
+      <div class="modal-list" id="walletsList">
+        <!-- Will be populated by JS -->
+      </div>
+      <button id="addWalletBtn" class="save-btn" style="width: 100%; margin-top: 10px;">Додати гаманець</button>
+      <button class="save-btn" style="width: 100%; margin-top: 10px;">Поповнити баланс</button>
+    </div>
+  </div>
+
+  <div class="modal" id="favoritesModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeFavoritesModal">&times;</span>
+      <h2>Улюблені страви</h2>
+      <div class="modal-list" id="favoritesList">
+        <!-- Will be populated by JS -->
+      </div>
+      <button id="addFavoriteBtn" class="save-btn" style="width: 100%; margin-top: 20px;">Додати страву</button>
+    </div>
+  </div>
+
+  <div class="modal" id="promoCodeModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closePromoModal">&times;</span>
+      <h2>Ваш промо код</h2>
+      <div class="promo-code-display" id="promoCodeDisplay">NAZ2024</div>
+      <button class="save-btn" style="width: 100%;" id="copyPromoBtn">Копіювати код</button>
+    </div>
+  </div>
+
+  <!-- Add Wallet Modal -->
+  <div class="modal" id="addWalletModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeAddWalletModal">&times;</span>
+      <h2>Додати гаманець</h2>
+      <form id="walletForm">
+        <div class="form-group">
+          <label for="walletName">Назва гаманця</label>
+          <input type="text" id="walletName" required>
+        </div>
+        <div class="form-group">
+          <label for="walletBalance">Початковий баланс</label>
+          <input type="number" id="walletBalance" min="0" step="0.01" value="0">
+        </div>
+        <div class="form-group">
+          <input type="checkbox" id="walletPrimary">
+          <label for="walletPrimary">Основний гаманець</label>
+        </div>
+        <button type="submit" class="save-btn">Зберегти</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Favorite Modal -->
+  <div class="modal" id="addFavoriteModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closeAddFavoriteModal">&times;</span>
+      <h2>Додати улюблену страву</h2>
+      <form id="favoriteForm">
+        <div class="form-group">
+          <label for="favoriteName">Назва страви</label>
+          <input type="text" id="favoriteName" required>
+        </div>
+        <div class="form-group">
+          <label for="favoriteCategory">Категорія</label>
+          <input type="text" id="favoriteCategory">
+        </div>
+        <button type="submit" class="save-btn">Додати</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="js/profile.js"></script>
+
+</body>
+</html>

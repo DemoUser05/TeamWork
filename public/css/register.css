@@ -1,0 +1,189 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background-color: #E3D1D1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: none;
+}
+
+.registration-container {
+  background-color: rgb(238, 207, 207);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  width: 100%;
+  max-width: 460px;
+  position: relative;
+  overflow: hidden;
+}
+
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 25px;
+  background: none;
+  border: none;
+  font-size: 35px;
+  cursor: pointer;
+  color: #555;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #555;
+  font-weight: 500;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #FE9A9B;
+}
+
+/* Стилі для рядка з паролями */
+.password-row {
+  display: flex;
+  gap: 10px;
+}
+
+.password-input {
+  flex: 1;
+  min-width: 0; /* Запобігає розтягуванню */
+}
+
+.password-feedback {
+  font-size: 12px; /* Менший розмір тексту */
+  margin-top: 5px;
+  min-height: 18px;
+}
+
+.error {
+  color: #ff4444;
+}
+
+.success {
+  color: #4CAF50;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background-color: #d0686a;
+  color: #333;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: background-color 0.3s;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary:hover {
+  transform: scale(1.01);
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #555;
+  font-size: 14px;
+}
+
+.login-link a {
+  color: #FE9A9B;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-link a:hover {
+  text-decoration: underline;
+}
+
+.btn-google {
+  width: 100%;
+  padding: 14px;
+  background-color: rgba(232, 222, 248, 1);
+  color: #555;
+  border: 1px solid #000000;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  gap: 10px;
+  transition: background-color 0.3s;
+}
+
+.btn-google:hover {
+  transform: scale(1.01); /* збільшення на 1% */
+}
+
+.btn-google img {
+  height: 18px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 12px 0;
+  color: #333;
+  font-size: 13px;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 3px solid #ddd;
+}
+
+.divider::before {
+  margin-right: 10px;
+}
+
+.divider::after {
+  margin-left: 10px;
+}

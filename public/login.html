@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вхід до акаунта</title>
+  <link rel="stylesheet" href="css/login.css" />
+</head>
+<body>
+  <div class="login-container">
+    <button onclick="window.history.back()" class="back-btn">←</button>
+    <h1>Вхід до аккаунта</h1>
+    
+    <div id="error-container" class="error-message"></div>
+    
+    <div class="input-group">
+      <label for="email">Email або телефон</label>
+      <input id="email" type="text" placeholder="Приклад: email@email.com або 380961234661" required />
+    </div>
+    
+    <div class="input-group">
+      <label for="password">Введіть пароль</label>
+      <input id="password" type="password" placeholder="" required />
+    </div>
+    
+    <a href="#" onclick="resetPassword()" class="forgot-password">Забули пароль?</a>
+    
+    <button onclick="login()" class="btn-primary">Увійти</button>
+    
+    <div class="divider">
+      <span>Або</span>
+    </div>
+    
+    <button onclick="googleSignIn()" class="btn-google">
+      Продовжити за допомогою Google
+      <img src="https://cdn-icons-png.flaticon.com/128/300/300221.png" alt="Google" width="18">
+    </button>
+    
+    <p class="register-link">Немає аккаунта? <a href="register.html">Зареєструватися</a></p>
+  </div>
+
+  <script type="module" src="js/login.js"></script>
+</body>
+</html>
