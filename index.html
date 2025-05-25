@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Дрібка смаку</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <header class="top-header">
+  <div class="left-side">
+  <span class="work-hours">
+      <strong>Без вихідних</strong> з 10:00 до 22:00
+  </span>
+</div>
+
+  <div class="center-side">
+    <span class="site-name">ДРІБКА СМАКУ</span>
+  </div>
+
+  <div class="right-side">
+    <div class="delivery-toggle">
+  <button class="active" id="delivery-btn">Доставка</button>
+  <button id="pickup-btn">Самовивіз</button>
+</div>
+
+    <select id="city-select" class="city-select">
+  <option value="">Місто</option>
+  <option value="Дрогобич">Дрогобич</option>
+  <option value="Львів">Львів</option>
+  <option value="Черкаси">Черкаси</option>
+</select>
+
+    <a class="login-link" href="#">Log in / Sign in</a>
+  </div>
+</header>
+
+
+<!-- Пошук вже поза хедером -->
+<div class="search-bar">
+  <input type="text" placeholder="Пошук у закладах..." />
+</div>
+
+
+  <!-- Рекламний банер -->
+ <section class="banner">
+  <a href="https://burek.com.ua" target="_blank">
+    <img src="images/cheburek.png" alt="Реклама Burek" style="width: 90%; border-radius: 10px;" />
+  </a>
+</section>
+
+  <!-- Категорії -->
+  <nav class="categories">
+    <button>Усі</button>
+    <button>🍔 Бургер</button>
+    <button>🍣 Суші</button>
+    <button>🍕 Піца</button>
+    <button>🍝 Паста</button>
+    <button>🍟 Фастфуд</button>
+    <button>🧁 Кексик</button>
+    <button>🥗 Салат</button>
+    <button>🍳 Сніданок</button>
+    <button>🥤 Напої</button>
+  </nav>
+
+  <!-- Фільтри -->
+  <div class="filters">
+  <select id="sort">
+    <option value="">Сортування</option>
+    <option value="rating">За рейтингом</option>
+    <option value="delivery">За швидкістю доставки</option>
+  </select>
+
+  <select id="filter">
+    <option value="">Фільтр</option>
+    <option value="веганське">Веганське</option>
+    <option value="халяль">Халяль</option>
+    <option value="без глютену">Без глютену</option>
+  </select>
+
+  <select id="price">
+    <option value="">Ціна</option>
+    <option value="low">До 150 грн</option>
+    <option value="medium">150–300 грн</option>
+    <option value="high">300+ грн</option>
+  </select>
+
+  <select id="promo">
+    <option value="">Акційні пропозиції</option>
+    <option value="yes">Тільки з акціями</option>
+  </select>
+</div>
+
+
+  <section class="popular">
+  <h2>Найпопулярніші заклади</h2>
+  <div class="carousel-container">
+    <button class="carousel-btn left" onclick="prevSlide()">‹</button>
+    <div class="carousel-track" id="carousel-track">
+      <div class="carousel-slide">
+  <a href="menu.html?id=1" class="restaurant-link">
+    <div class="card"><img src="images/daily_dose.png"/><p>Daily Dose</p></div>
+  </a>
+  <a href="menu.html?id=2" class="restaurant-link">
+    <div class="card"><img src="images/kolos.png"/><p>Kolos</p></div>
+  </a>
+  <a href="menu.html?id=3" class="restaurant-link">
+    <div class="card"><img src="images/una_pinsa.png"/><p>Una Pinsa</p></div>
+  </a>
+  <a href="menu.html?id=4" class="restaurant-link">
+    <div class="card"><img src="images/levova_paliantysia.png"/><p>Levova Paliantysia</p></div>
+  </a>
+  <a href="menu.html?id=5" class="restaurant-link">
+    <div class="card"><img src="images/burger_star.jpg"/><p>Burger Star</p></div>
+  </a>
+</div>
+
+<div class="carousel-slide">
+  <a href="menu.html?id=7" class="restaurant-link">
+    <div class="card"><img src="images/noa.webp"/><p>Noa</p></div>
+  </a>
+  <a href="menu.html?id=6" class="restaurant-link">
+    <div class="card"><img src="images/shoco.jpg"/><p>SHOco</p></div>
+  </a>
+  <a href="menu.html?id=8" class="restaurant-link">
+    <div class="card"><img src="images/pasta_fresca.jpeg"/><p>Pasta Fresca</p></div>
+  </a>
+  <a href="menu.html?id=10" class="restaurant-link">
+    <div class="card"><img src="images/mcdonalds.png"/><p>McDonald’s</p></div>
+  </a>
+  <a href="menu.html?id=11" class="restaurant-link">
+    <div class="card"><img src="images/good_friend.jpg"/><p>Good Friend</p></div>
+  </a>
+</div>
+
+    <button class="carousel-btn right" onclick="nextSlide()">›</button>
+  </div>
+</section>
+
+  <!-- Усі -->
+  <section class="all-places">
+    <h2>Усі заклади</h2>
+    <div class="restaurants" id="restaurant-list">
+      <!-- генерується через JS -->
+    </div>
+  </section>
+
+  <!-- Футер -->
+  <footer>
+    <div class="footer-links">
+      <div>
+        <h3>Корисні посилання</h3>
+        <ul>
+          <li><a href="#">Про нас</a></li>
+          <li><a href="#">Часті запитання</a></li>
+          <li><a href="#">Блог</a></li>
+          <li><a href="#">Зв’язатися з нами</a></li>
+          <li><a href="#">Безпека</a></li>
+        </ul>
+      </div>
+      <div>
+        <h3>Ми у соціальних мережах</h3>
+        <p><a href="https://instagram.com" target="_blank">Instagram</a></p>
+        <p><a href="https://facebook.com" target="_blank">Facebook</a></p>
+        <p><a href="https://t.me" target="_blank">Telegram</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
