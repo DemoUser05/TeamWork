@@ -1,0 +1,112 @@
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f3e4e5;
+}
+
+.bg-pink {
+  background-color: #f3aab2;
+}
+
+.bg-purple {
+  background-color: #5e5b8c;
+}
+
+.card-custom {
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #7562a6; /* Приклад фіолетового, змінити під дизайн */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.toggle-switch {
+  display: flex;
+  gap: 4px;
+}
+
+.badge {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+
+input, textarea, .form-control {
+  background-color: #e6e4f7;
+  border: none;
+  border-radius: 10px;
+}
+
+.btn-light {
+  background-color: #dedbfc;
+}
+
+.btn-dark {
+  background-color: #5e5b8c;
+  color: white;
+}
+
+.btn-success {
+  background-color: #6dcf9e;
+  border: none;
+}
+
+img {
+  height: 60px;
+  width: 60px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Стилі для модалки */
+.modal-content {
+  border-radius: 0.5rem;
+}
+
+/* Щоб кнопки не сильно розсувалися */
+.input-group > input[type="tel"] {
+  min-width: 0;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+}
+
+/* Стилі для кнопок + і - */
+#order-items button.btn-sm {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 18px;
+  line-height: 1;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1.5px solid #ccc;
+  background-color: #f8f9fa;
+  color: #333;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+  user-select: none;
+}
+
+#order-items button.btn-sm:hover {
+  background-color: #6f42c1; /* фіолетовий відтінок */
+  border-color: #5a34a5;
+  color: #fff;
+  cursor: pointer;
+}
+
+#order-items button.btn-sm:focus {
+  outline: none;
+  box-shadow: 0 0 5px #6f42c1;
+}
+
+.payment-methods .form-check-input:checked {
+  background-color: #b89eff;
+  border-color: #b89eff;
+  box-shadow: 0 0 0 0.2rem rgba(184, 158, 255, 0.25);
+}
+
+.payment-methods .form-check-input {
+  cursor: pointer;
+}

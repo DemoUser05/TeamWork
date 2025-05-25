@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Реєстрація</title>
+  <link rel="stylesheet" href="css/register.css">
+</head>
+<body>
+  <div class="registration-container">
+    <button onclick="window.history.back()" class="back-btn">←</button>
+    <h1>Реєстрація</h1>
+    
+    <div class="input-group">
+      <label for="name">Ім'я</label>
+      <input id="name" type="text" placeholder="Введіть ваше ім'я" required>
+    </div>
+    
+    <div class="input-group">
+      <label for="email">Email</label>
+      <input id="email" type="email" placeholder="Введіть ваш email" required>
+    </div>
+    
+    <div class="password-row">
+      <div class="input-group password-input">
+        <label for="password">Пароль</label>
+        <input id="password" type="password" placeholder="Введіть пароль" required>
+        <div id="password-strength" class="password-feedback"></div>
+      </div>
+      
+      <div class="input-group password-input">
+        <label for="confirm-password">Підтвердіть</label>
+        <input id="confirm-password" type="password" placeholder="Повторіть пароль" required>
+        <div id="password-match" class="password-feedback"></div>
+      </div>
+    </div>
+    
+    <div class="input-group">
+      <label for="phone">Телефон (необов'язково)</label>
+      <input id="phone" type="tel" placeholder="Введіть ваш телефон">
+    </div>
+    
+    <button id="registerBtn" class="btn-primary" disabled>Зареєструватися</button>
+    
+    <div class="divider">
+      <span>Або</span>
+    </div>
+
+    <button id="googleSignInBtn" class="btn btn-google">
+        Зареєструватися через Google
+        <img src="https://cdn-icons-png.flaticon.com/128/300/300221.png" alt="Google"> 
+    </button>
+
+    <div id="google-error" class="error-message" style="display: none;"></div>
+
+    <p class="login-link">Вже маєте акаунт? <a href="login.html">Увійти</a></p>
+  </div>
+
+  <script type="module" src="js/register.js"></script>
+</body>
+</html>
