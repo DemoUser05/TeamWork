@@ -2,14 +2,14 @@ let selectedCity = null; // або null, або "Київ", "Львів", "Од�
 
 const restaurants = [
   { id: "1", name: "Daily Dose", category: [,"бургер", "салат", "піца", "паста"], city: ["Львів", "Дрогобич", "Черкаси"], rating: 4.9, deliveryTime: 20, avgPrice: 220, tags: ["веганське", "без глютену"], promo: true, img: "images/daily_dose.png" },
-  { id: "2", name: "Kolos", category: ["сніданок", "напої", "салат"], city: ["Львів", "Дрогобич"] ,rating: 4.3, deliveryTime: 45, avgPrice: 300, tags: ["халяль"], promo: false, img: "images/kolos.png" },
-  { id: "3", name: "Una Pinsa", category: "піца", city: "Львів", rating: 4.4, deliveryTime: 35, avgPrice: 170, tags: ["без глютену", "халяль"], promo: true, img: "images/una_pinsa.png" },
-  { id: "4", name: "Levova Paliantysia", category: ["салат", "піца", "сніданок"], city: "Львів", rating: 4.7, deliveryTime: 25, avgPrice: 120, tags: ["халяль"], promo: false, img: "images/levova_paliantysia.png" },
+  { id: "2", name: "Kolos", category: ["сніданок", "напої", "салат", "напої", "кексик"], city: ["Львів", "Дрогобич"] ,rating: 4.3, deliveryTime: 45, avgPrice: 300, tags: ["халяль"], promo: false, img: "images/kolos.png" },
+  { id: "3", name: "Una Pinsa", category: ["піца", "сніданок", "паста"], city: "Львів", rating: 4.4, deliveryTime: 35, avgPrice: 170, tags: ["без глютену", "халяль"], promo: true, img: "images/una_pinsa.png" },
+  { id: "4", name: "Levova Paliantysia", category: ["салат", "піца", "сніданок", "напої"], city: "Львів", rating: 4.7, deliveryTime: 25, avgPrice: 120, tags: ["халяль"], promo: false, img: "images/levova_paliantysia.png" },
 
-  { id: "5", name: "Burger Star", category: ["бургер","напої"], city: "Черкаси", rating: 4.7, deliveryTime: 30, avgPrice: 200, tags: [], promo: true, img: "images/burger_star.jpg" },
+  { id: "5", name: "Burger Star", category: ["бургер","напої", "салат", "фастфуд"], city: "Черкаси", rating: 4.7, deliveryTime: 30, avgPrice: 200, tags: [], promo: true, img: "images/burger_star.jpg" },
   { id: "6", name: "SHOco", category: ["кексик", "напої"], city: "Львів",  promo: false, rating: 4.2, deliveryTime: 50, avgPrice: 160, tags: ["без глютену", "веганське"], img: "images/shoco.jpg" },
-  { id: "7", name: "Noa", category: "суші", city: ["Львів", "Черкаси"], promo: false, rating: 4.8, deliveryTime: 40, avgPrice: 350, tags: ["веганське"], img: "images/noa.webp" },
-  { id: "8", name: "Pasta Fresca", category: "паста", city: "Дрогобич", promo: true, rating: 3.8, deliveryTime: 45, avgPrice: 210, tags: ["без глютену", "веганське"], img: "images/pasta_fresca.jpeg" },
+  { id: "7", name: "Noa", category: ["суші", "напої", "салат"], city: ["Львів", "Черкаси"], promo: false, rating: 4.8, deliveryTime: 40, avgPrice: 350, tags: ["веганське"], img: "images/noa.webp" },
+  { id: "8", name: "Pasta Fresca", category: ["паста", "сніданок", "напої", "кексик"], city: "Дрогобич", promo: true, rating: 3.8, deliveryTime: 45, avgPrice: 210, tags: ["без глютену", "веганське"], img: "images/pasta_fresca.jpeg" },
 
   { id: "9", name: "Trdlo", category: "кексик", city: "Львів", promo: true, rating: 4.7, deliveryTime: 20, avgPrice: 110, tags: [], img: "images/trdlo.png" },
   { id: "10", name: "mcdonalds", category: ["фастфуд", "бургер", "напої", "салат"], city: ["Львів", "Дрогобич", "Черкаси"], promo: false, rating: 4.7, deliveryTime: 30, avgPrice: 190, tags: [], img: "images/mcdonalds.png" },
@@ -170,3 +170,58 @@ pickupBtn.addEventListener("click", () => {
   console.log("Обрано:", deliveryMode);
 });
 
+document.querySelectorAll(".modal-link").forEach(link => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+    
+    const modal = document.getElementById("modal");
+    const title = document.getElementById("modal-title");
+    const text = document.getElementById("modal-text");
+    
+    title.textContent = link.getAttribute("data-title");
+    text.textContent = link.getAttribute("data-text");
+    
+    modal.style.display = "flex";
+  });
+});
+
+document.querySelector(".close-modal").addEventListener("click", () => {
+  document.getElementById("modal").style.display = "none";
+});
+
+window.addEventListener("click", (e) => {
+  if (e.target === document.getElementById("modal")) {
+    document.getElementById("modal").style.display = "none";
+  }
+});
+
+document.querySelectorAll(".modal-link").forEach(link => {
+  link.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    const modal = document.getElementById("modal");
+    const title = document.getElementById("modal-title");
+    const text = document.getElementById("modal-text");
+
+    title.textContent = link.getAttribute("data-title");
+    
+    // Заміняємо <br><br> на окремі <p> елементи
+    const formattedText = link.getAttribute("data-text").split("<br><br>").map(line => `<p>${line}</p>`).join("");
+
+    text.innerHTML = formattedText;
+
+    modal.style.display = "flex";
+  });
+});
+
+document.getElementById("reset-filters").addEventListener("click", () => {
+  document.getElementById("sort").value = "";
+  document.getElementById("filter").value = "";
+  document.getElementById("price").value = "";
+  document.getElementById("promo").value = "";
+
+  selectedCity = null;
+  document.getElementById("city-select").value = "";
+  
+  renderRestaurants(restaurants); // Повертає стандартний список ресторанів
+});

@@ -34,6 +34,9 @@
           <button class="active" id="delivery-btn">Доставка</button>
           <button id="pickup-btn">Самовивіз</button>
         </div>
+        <a href="order.html" class="cart-link">
+            <img src="images/cart.png" alt="Кошик" class="cart-icon" />
+        </a>
 
         <select id="city-select" class="city-select">
           <option value="">Місто</option>
@@ -56,7 +59,7 @@
   
     <!-- Пошук вже поза хедером -->
     <div class="search-bar">
-      <input type="text" placeholder="Пошук у закладах..." />
+      <input type="text" placeholder="Пошук закладів..." />
     </div>
 
     <!-- Рекламний банер -->
@@ -103,10 +106,13 @@
       </select>
 
       <select id="promo">
-        <option value="">Акційні пропозиції</option>
+        <option value="">Усі пропозиції</option>
         <option value="yes">Тільки з акціями</option>
       </select>
+
+      <button id="reset-filters" class="btn-reset">Скинути фільтри</button>
     </div>
+    
 
     <section class="popular">
       <h2>Найпопулярніші заклади</h2>
@@ -167,12 +173,21 @@
         <div>
           <h3>Корисні посилання</h3>
           <ul>
-            <li><a href="#">Про нас</a></li>
-            <li><a href="#">Часті запитання</a></li>
-            <li><a href="#">Блог</a></li>
-            <li><a href="#">Зв'язатися з нами</a></li>
-            <li><a href="#">Безпека</a></li>
+            <li><a href="#" class="modal-link" data-title="Про нас" data-text="Дрібка смаку — це платформа доставки їжі з найкращими ресторанами у вашому місті. Ми працюємо без вихідних, забезпечуючи швидку доставку улюблених страв! Наші основні принципи: Швидкість обробки замовлень. Надійність та якість обслуговування. Різноманітність ресторанів та страв Якщо ви любите смачну їжу, ви у правильному місці!">Про нас</a></li>           
+            <li><a href="#" class="modal-link" data-title="Часті запитання" 
+  data-text="Як оформити замовлення?<br><br> Виберіть ресторан, додайте страви до кошика, виберіть спосіб оплати та натисніть 'Оформити замовлення'.<br><br>
+  Які способи оплати доступні?<br><br> Можна оплатити карткою онлайн, готівкою або через Apple Pay.<br><br>
+  Як змінити замовлення після оформлення?<br><br> Зверніться до служби підтримки, якщо зміни можливі.<br><br>
+  Як працює доставка?<br><br> Доставка займає від 20 до 50 хвилин залежно від ресторану та вашого місцезнаходження.<br><br>
+ Що робити, якщо є проблема з замовленням?<br><br> Якщо страва не відповідає опису або є інші питання, напишіть нам через форму зворотного зв’язку.">
+  Часті запитання
+</a></li>
+
+            <li><a href="#" class="modal-link" data-title="Блог" data-text="Читайте новини про гастрономічні тренди та огляди ресторанів у нашому блозі!">Блог</a></li>
+            <li><a href="#" class="modal-link" data-title="Зв'язатися з нами" data-text="Ми завжди відкриті для зв’язку з нашими клієнтами! Ви можете написати нам у соціальних мережах або через email:<br><br> support@dribkasmaky.ua +380-96-123-45-67<br><br> Наші соцмережі: Instagram Facebook Telegram">Зв'язатися з нами</a></li>           
+            <li><a href="#" class="modal-link" data-title="Безпека" data-text="Ми гарантуємо безпечні транзакції та збереження ваших персональних даних.">Безпека</a></li>
           </ul>
+
         </div>
         <div>
           <h3>Ми у соціальних мережах</h3>
@@ -184,6 +199,15 @@
     </footer>
   </div>
 </div>
+
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <h2 id="modal-title"></h2>
+    <p id="modal-text"></p>
+  </div>
+</div>
+
 
   <script type="module">
     // Імпорт необхідних функцій Firebase
