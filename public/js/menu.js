@@ -154,38 +154,32 @@ const fullMenu = [
     }
 ];
 
-// Функція для отримання ID ресторану з URL
 function getRestaurantIdFromURL() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("id");
+    const params = new URLSearchParams(window.location.search);
+    return params.get("id");
 }
 
 const restaurantId = getRestaurantIdFromURL();
-console.log("Ресторан ID:", restaurantId);
 
-// Дані про ресторани (назви та фото)
 const restaurantData = {
-  "1": { name: "Daily Dose", image: "images/background_menu.png" },
-  "2": { name: "Kolos", image: "images/kolos_banner.png" },
-  "3": { name: "Una Pinsa", image: "images/unapinsa_banner.png" },
-  "4": { name: "Levova Paliantysia", image: "images/levovapalianytsia_banner.png" },
-  "5": { name: "Burger Star", image: "images/burgerstar_banner.png" },
-  "6": { name: "SHOco", image: "images/shoco_banner.png" },
-  "7": { name: "Noa", image: "images/noa_banner.png" },
-  "8": { name: "Pasta Fresca", image: "images/pastafresca_banner.png" },
-  "9": { name: "Trdlo", image: "images/trdlo_banner.png" },
-  "10": { name: "McDonald's", image: "images/mcdonalds_banner.png" },
-  "11": { name: "Good Friend", image: "images/goodfriend_banner.png" },
-  "12": { name: "Sushi King", image: "images/sushiking_banner.png" }
+    "1": { name: "Daily Dose", image: "images/background_menu.png" },
+    "2": { name: "Kolos", image: "images/kolos_banner.png" },
+    "3": { name: "Una Pinsa", image: "images/unapinsa_banner.png" },
+    "4": { name: "Levova Paliantysia", image: "images/levovapalianytsia_banner.png" },
+    "5": { name: "Burger Star", image: "images/burgerstar_banner.png" },
+    "6": { name: "SHOco", image: "images/shoco_banner.png" },
+    "7": { name: "Noa", image: "images/noa_banner.png" },
+    "8": { name: "Pasta Fresca", image: "images/pastafresca_banner.png" },
+    "9": { name: "Trdlo", image: "images/trdlo_banner.png" },
+    "10": { name: "McDonald's", image: "images/mcdonalds_banner.png" },
+    "11": { name: "Good Friend", image: "images/goodfriend_banner.png" },
+    "12": { name: "Sushi King", image: "images/sushiking_banner.png" }
 };
 
-// Оновлюємо назву та фото ресторану, якщо ID є в списку
 if (restaurantData[restaurantId]) {
-  document.getElementById("restaurant-title").textContent = restaurantData[restaurantId].name;
-  document.getElementById("restaurant-image").src = restaurantData[restaurantId].image;
+    document.getElementById("restaurant-title").textContent = restaurantData[restaurantId].name;
+    document.getElementById("restaurant-image").src = restaurantData[restaurantId].image;
 }
-
-
 
 function createMenuItem(item) {
     const div = document.createElement("div");
@@ -223,6 +217,25 @@ const fullMenuContainer = document.getElementById("full-menu-items");
 
 let filteredSpecialOffers = [...specialOffers];
 let filteredFullMenu = [...fullMenu];
+let currentSortOption = "popularity-desc"; // Змінено початкове значення за замовчуванням
+
+function getPopularity(item) {
+    return parseInt(item.rating.match(/\d+/)[0]); // Отримуємо числове значення рейтингу (відсоток)
+}
+
+function applySort(items) {
+    if (currentSortOption === "price-asc") {
+        return [...items].sort((a, b) => a.price - b.price);
+    } else if (currentSortOption === "price-desc") {
+        return [...items].sort((a, b) => b.price - a.price);
+    } else if (currentSortOption === "popularity-asc") {
+        return [...items].sort((a, b) => getPopularity(a) - getPopularity(b));
+    } else if (currentSortOption === "popularity-desc") {
+        return [...items].sort((a, b) => getPopularity(b) - getPopularity(a));
+    } else {
+        return [...items];
+    }
+}
 
 renderMenuItems(filteredSpecialOffers, specialOffersContainer);
 renderMenuItems(filteredFullMenu, fullMenuContainer);
@@ -238,24 +251,17 @@ searchInput.addEventListener("input", () => {
         item.name.toLowerCase().includes(searchTerm) || 
         item.description.toLowerCase().includes(searchTerm)
     );
+    filteredSpecialOffers = applySort(filteredSpecialOffers);
+    filteredFullMenu = applySort(filteredFullMenu);
     renderMenuItems(filteredSpecialOffers, specialOffersContainer);
     renderMenuItems(filteredFullMenu, fullMenuContainer);
 });
 
 const sortSelect = document.getElementById("sort-select");
 sortSelect.addEventListener("change", () => {
-    const sortOption = sortSelect.value;
-    const sortItems = (items) => {
-        if (sortOption === "price-asc") {
-            return [...items].sort((a, b) => a.price - b.price);
-        } else if (sortOption === "price-desc") {
-            return [...items].sort((a, b) => b.price - a.price);
-        } else {
-            return [...items]; 
-        }
-    };
-    filteredSpecialOffers = sortItems(filteredSpecialOffers);
-    filteredFullMenu = sortItems(filteredFullMenu);
+    currentSortOption = sortSelect.value;
+    filteredSpecialOffers = applySort(filteredSpecialOffers);
+    filteredFullMenu = applySort(filteredFullMenu);
     renderMenuItems(filteredSpecialOffers, specialOffersContainer);
     renderMenuItems(filteredFullMenu, fullMenuContainer);
 });
@@ -326,6 +332,8 @@ filterBtn.addEventListener("click", () => {
             return matchesCategory && matchesPrice && matchesRating;
         });
 
+        filteredSpecialOffers = applySort(filteredSpecialOffers);
+        filteredFullMenu = applySort(filteredFullMenu);
         renderMenuItems(filteredSpecialOffers, specialOffersContainer);
         renderMenuItems(filteredFullMenu, fullMenuContainer);
         filterModal.classList.add("fade-out");
@@ -340,6 +348,8 @@ filterBtn.addEventListener("click", () => {
         filterModal.querySelector("#rating-min").value = 80;
         filteredSpecialOffers = [...specialOffers];
         filteredFullMenu = [...fullMenu];
+        filteredSpecialOffers = applySort(filteredSpecialOffers);
+        filteredFullMenu = applySort(filteredFullMenu);
         renderMenuItems(filteredSpecialOffers, specialOffersContainer);
         renderMenuItems(filteredFullMenu, fullMenuContainer);
     });
@@ -447,10 +457,34 @@ function openModal(item) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    const backBtn = document.querySelector('.back-btn');
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    }
+
     const cartIcon = document.querySelector('.cart-icon');
     if (cartIcon) {
-      cartIcon.addEventListener('click', () => {
-        window.location.href = 'order.html'; // або інший шлях до сторінки кошика
-      });
+        cartIcon.addEventListener('click', () => {
+            window.location.href = 'order.html'; 
+        });
     }
-  });  
+
+    const deliveryBtn = document.querySelector(".delivery");
+    const pickupBtn = document.querySelector(".pickup");
+
+    deliveryBtn.addEventListener("click", () => {
+        deliveryBtn.classList.add("active");
+        deliveryBtn.classList.remove("inactive");
+        pickupBtn.classList.remove("active");
+        pickupBtn.classList.add("inactive");
+    });
+
+    pickupBtn.addEventListener("click", () => {
+        pickupBtn.classList.add("active");
+        pickupBtn.classList.remove("inactive");
+        deliveryBtn.classList.remove("active");
+        deliveryBtn.classList.add("inactive");
+    });
+});

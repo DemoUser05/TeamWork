@@ -12,7 +12,7 @@
     <div class="container">
         <header class="header">
             <nav class="nav-bar">
-                <div class="menu-icon">☰</div>
+                <button class="back-btn">← Назад</button>
                 <div class="nav-items">
                     <select class="address-select">
                         <option>Вибрати Місто</option>
@@ -31,19 +31,18 @@
                 </div>
             </nav>
             <div class="hero-image">
-    <img id="restaurant-image" src="images/default.jpg" alt="Головне фото ресторану">
-    <div class="overlay">
-        <h1 id="restaurant-title">Завантаження...</h1>
-        <div class="dose-info">
-            <span class="rating">4.7 ★ (+1000)</span>
-            <span class="hours">10:00 до 22:00</span>
-        </div>
-    </div>
-</div>
-
+                <img id="restaurant-image" src="images/default.jpg" alt="Головне фото ресторану">
+                <div class="overlay">
+                    <h1 id="restaurant-title">Завантаження...</h1>
+                    <div class="dose-info">
+                        <span class="rating">4.7 ★ (+1000)</span>
+                        <span class="hours">10:00 до 22:00</span>
+                    </div>
+                </div>
+            </div>
             <div class="delivery-options">
                 <span class="delivery active">Доставка</span>
-                <span class="pickup">Самовивіз</span>
+                <span class="pickup inactive">Самовивіз</span>
             </div>
         </header>
         
@@ -52,7 +51,8 @@
                 <div class="filters">
                     <button class="filter-btn" id="filter-btn">Фільтр</button>
                     <select class="sort-select" id="sort-select">
-                        <option value="popularity">Сортувати за популярністю</option>
+                        <option value="popularity-desc">Сортувати за популярністю: від високої до низької</option>
+                        <option value="popularity-asc">Сортувати за популярністю: від низької до високої</option>
                         <option value="price-asc">Сортувати за ціною: від низької до високої</option>
                         <option value="price-desc">Сортувати за ціною: від високої до низької</option>
                     </select>
@@ -71,4 +71,3 @@
     </div>
 </body>
 </html>
-
