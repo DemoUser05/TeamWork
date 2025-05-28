@@ -107,6 +107,24 @@ body {
     margin-top: 60px; 
 }
 
+.hero-image {
+    width: 100%;
+    height: 250px; /* Встановлюємо фіксовану висоту */
+    overflow: hidden; /* Обрізає зайві частини */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.hero-image img {
+    width: 100%;
+    height: 250px;
+    max-height: 250px; /* Обмежуємо максимальну висоту */
+    object-fit: cover; /* Обрізає зайві частини і правильно заповнює блок */
+}
+
+
 .overlay {
     position: absolute;
     top: 0;

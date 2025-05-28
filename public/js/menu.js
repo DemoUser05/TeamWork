@@ -154,6 +154,7 @@ const fullMenu = [
     }
 ];
 
+// Функція для отримання ID ресторану з URL
 function getRestaurantIdFromURL() {
   const params = new URLSearchParams(window.location.search);
   return params.get("id");
@@ -161,6 +162,29 @@ function getRestaurantIdFromURL() {
 
 const restaurantId = getRestaurantIdFromURL();
 console.log("Ресторан ID:", restaurantId);
+
+// Дані про ресторани (назви та фото)
+const restaurantData = {
+  "1": { name: "Daily Dose", image: "images/background_menu.png" },
+  "2": { name: "Kolos", image: "images/kolos_banner.png" },
+  "3": { name: "Una Pinsa", image: "images/unapinsa_banner.png" },
+  "4": { name: "Levova Paliantysia", image: "images/levovapalianytsia_banner.png" },
+  "5": { name: "Burger Star", image: "images/burgerstar_banner.png" },
+  "6": { name: "SHOco", image: "images/shoco_banner.png" },
+  "7": { name: "Noa", image: "images/noa_banner.png" },
+  "8": { name: "Pasta Fresca", image: "images/pastafresca_banner.png" },
+  "9": { name: "Trdlo", image: "images/trdlo_banner.png" },
+  "10": { name: "McDonald's", image: "images/mcdonalds_banner.png" },
+  "11": { name: "Good Friend", image: "images/goodfriend_banner.png" },
+  "12": { name: "Sushi King", image: "images/sushiking_banner.png" }
+};
+
+// Оновлюємо назву та фото ресторану, якщо ID є в списку
+if (restaurantData[restaurantId]) {
+  document.getElementById("restaurant-title").textContent = restaurantData[restaurantId].name;
+  document.getElementById("restaurant-image").src = restaurantData[restaurantId].image;
+}
+
 
 
 function createMenuItem(item) {
