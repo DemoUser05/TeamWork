@@ -1,170 +1,128 @@
-const items = [
-  { name: "Лента ребер", price: 190, img: "images/rebra.png", qty: 1 },
-  { name: "Prosciutto Cotto", price: 389, img: "images/cotto.png", qty: 1 },
-  { name: "Filet mignon", price: 391, img: "images/filet.png", qty: 1 }
-];
-
-let discount = 0;
+// Initialize cart service
+const cartService = new CartService();
 
 function renderOrder() {
-  const container = document.getElementById("order-items");
-  container.innerHTML = "";
+    const container = document.getElementById("order-items");
+    container.innerHTML = "";
 
-  items.forEach((item, index) => {
-    const div = document.createElement("div");
-    div.className = "d-flex align-items-center mb-3";
-    div.innerHTML = `
-      <img src="${item.img}" alt="${item.name}" class="me-2">
-      <div class="flex-grow-1">
-        <strong>${item.name}</strong><br>
-        ${item.price} грн
-      </div>
-      <button class="btn btn-sm btn-outline-secondary me-1" onclick="changeQty(${index}, -1)">-</button>
-      <span>${item.qty}</span>
-      <button class="btn btn-sm btn-outline-secondary ms-1" onclick="changeQty(${index}, 1)">+</button>
-    `;
-    container.appendChild(div);
-  });
+    if (cartService.cart.length === 0) {
+        container.innerHTML = `
+            <div class="empty-cart">
+                <i class="bi bi-cart3"></i>
+                <p>Ваш кошик порожній</p>
+                <a href="index.html" class="btn btn-outline-light">Перейти до меню</a>
+            </div>
+        `;
+        return;
+    }
 
-  updateSummary();
-}
+    cartService.cart.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.className = "item d-flex align-items-center gap-3 mb-3";
+        div.innerHTML = `
+            <img src="${item.image}" alt="${item.name}">
+            <div class="flex-grow-1">
+                <h6 class="mb-1">${item.name}</h6>
+                <div class="text-muted small">
+                    ${item.extras.map(extra => `${extra.name}`).join(', ')}
+                </div>
+                <div class="price">${item.price} грн</div>
+            </div>
+            <div class="quantity-controls">
+                <button class="btn btn-sm" onclick="cartService.updateQuantity(${index}, -1)">-</button>
+                <span class="mx-2">${item.quantity}</span>
+                <button class="btn btn-sm" onclick="cartService.updateQuantity(${index}, 1)">+</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
 
-function changeQty(index, delta) {
-  items[index].qty = Math.max(0, items[index].qty + delta);
-  renderOrder();
+    updateSummary();
 }
 
 function updateSummary() {
-  const list = document.getElementById("summary");
-  list.innerHTML = "";
+    const list = document.getElementById("summary");
+    list.innerHTML = "";
 
-  let total = 0;
-  let subtotal = 0;
+    // Subtotal
+    const subtotal = cartService.getTotal();
+    const subtotalItem = document.createElement("li");
+    subtotalItem.innerHTML = `<span>Вартість страв</span><span>${subtotal} ₴</span>`;
+    list.appendChild(subtotalItem);
 
-  items.forEach(item => {
-    if (item.qty > 0) {
-      const li = document.createElement("li");
-      li.className = "list-group-item d-flex justify-content-between";
-      li.textContent = `${item.name} x ${item.qty}`;
-      const span = document.createElement("span");
-      span.textContent = `${item.price * item.qty} грн`;
-      li.appendChild(span);
-      list.appendChild(li);
-      subtotal += item.price * item.qty;
+    // Delivery fee
+    const deliveryFee = subtotal >= 500 ? 0 : 60;
+    const deliveryItem = document.createElement("li");
+    deliveryItem.innerHTML = deliveryFee === 0
+        ? `<span>Доставка</span><span class="text-success">Безкоштовно</span>`
+        : `<span>Доставка</span><span>${deliveryFee} ₴</span>`;
+    list.appendChild(deliveryItem);
+
+    // Service fee
+    const serviceFee = subtotal > 0 ? 20 : 0;
+    const serviceItem = document.createElement("li");
+    serviceItem.innerHTML = `<span>Сервісний збір</span><span>${serviceFee} ₴</span>`;
+    list.appendChild(serviceItem);
+
+    // Total
+    const total = subtotal + deliveryFee + serviceFee;
+    const totalItem = document.createElement("li");
+    totalItem.innerHTML = `<span>Всього до сплати</span><strong>${total} ₴</strong>`;
+    list.appendChild(totalItem);
+
+    // Update pay button state
+    const payButton = document.querySelector('.btn-success');
+    if (payButton) {
+        payButton.disabled = total === 0;
     }
-  });
-
-  total = subtotal;
-
-  // Знижка
-  if (discount > 0) {
-    const disc = document.createElement("li");
-    disc.className = "list-group-item d-flex justify-content-between";
-    disc.innerHTML = `<strong>Знижка</strong> <span style="color: #b89eff;">-${discount} грн</span>`;
-    list.appendChild(disc);
-    total -= discount;
-  }
-
-  // Робота кур'єра
-  const deliveryFee = subtotal >= 500 ? 0 : 60;
-  const delivery = document.createElement("li");
-  delivery.className = "list-group-item d-flex justify-content-between";
-  delivery.innerHTML = deliveryFee === 0
-    ? `<span>Робота кур'єра</span> <span style="color: #5e5b8c;"><s>60 грн</s> Безкоштовно</span>`
-    : `<span>Робота кур'єра</span> <span>${deliveryFee} грн</span>`;
-  list.appendChild(delivery);
-  total += deliveryFee;
-
-  // Сервісний збір
-  const serviceFee = 20;
-  const service = document.createElement("li");
-  service.className = "list-group-item d-flex justify-content-between";
-  service.innerHTML = `<span>Сервісний збір</span> <span>${serviceFee} грн</span>`;
-  list.appendChild(service);
-  total += serviceFee;
-
-  // Разом
-  const totalItem = document.createElement("li");
-  totalItem.className = "list-group-item d-flex justify-content-between fw-bold";
-  totalItem.innerHTML = `Разом <span>${total} грн</span>`;
-  list.appendChild(totalItem);
 }
 
-
+// Handle promo code
 function applyPromo() {
-  const code = document.getElementById("promo").value.trim().toLowerCase();
-  if (code === "daily dose") {
-    discount = 50;
-    gsap.to("#promo", { backgroundColor: "#c2f0c2", duration: 0.5 });
-  } else {
-    discount = 0;
-    gsap.to("#promo", { backgroundColor: "#f5c2c2", duration: 0.5 });
-  }
-  updateSummary();
+    const promoInput = document.querySelector('input[placeholder="Промокод"]');
+    const code = promoInput.value.trim().toLowerCase();
+    
+    if (code === 'daily dose') {
+        const discount = Math.min(50, cartService.getTotal() * 0.1); // 10% off, max 50 UAH
+        if (discount > 0) {
+            cartService.showNotification('Промокод застосовано!');
+            promoInput.style.borderColor = '#FE9A9B';
+            setTimeout(() => promoInput.style.borderColor = '', 2000);
+        } else {
+            cartService.showNotification('Додайте товари в кошик');
+            promoInput.style.borderColor = '#dc3545';
+            setTimeout(() => promoInput.style.borderColor = '', 2000);
+        }
+    } else {
+        cartService.showNotification('Недійсний промокод');
+        promoInput.style.borderColor = '#dc3545';
+        setTimeout(() => promoInput.style.borderColor = '', 2000);
+    }
 }
 
-function toggleEdit(id) {
-  const input = document.getElementById(id);
-  input.disabled = !input.disabled;
-  if (!input.disabled) input.focus();
-}
-
-// >>> Модальне вікно для адреси <<<
-function openAddressModal() {
-  const modalElement = document.getElementById('addressModal');
-  const modal = new bootstrap.Modal(modalElement);
-  modal.show();
-}
-
+// Handle delivery toggle
 document.addEventListener('DOMContentLoaded', () => {
-  // Збереження адреси з модального вікна
-  const saveAddressBtn = document.getElementById('saveAddressBtn');
-  const addressDisplay = document.getElementById('address');
-  const addressModal = new bootstrap.Modal(document.getElementById('addressModal'));
-
-  saveAddressBtn.addEventListener('click', () => {
-    const city = document.getElementById('city').value.trim();
-    const street = document.getElementById('street').value.trim();
-    const floor = document.getElementById('floor').value.trim();
-    const apartment = document.getElementById('apartment').value.trim();
-    const entrance = document.getElementById('entrance').value.trim();
-
-    const parts = [city, street, floor, apartment, entrance].filter(Boolean);
-    addressDisplay.value = parts.length ? parts.join(', ') : 'Не вказано';
-
-    addressModal.hide();
-  });
-
-  // Анімація для телефону
-  const editPhoneBtns = document.querySelectorAll('button[onclick*="togglePhoneEdit"]');
-  const phoneInputWrapper = document.getElementById('phoneInputWrapper');
-  const phoneInput = document.getElementById('phone');
-  
-  let phoneVisible = false;
-  
-  editPhoneBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (!phoneVisible) {
-        phoneInput.disabled = false;
-        phoneInputWrapper.classList.add('active');
-        gsap.fromTo(phoneInputWrapper, { width: 0 }, { duration: 0.5, width: 180, ease: "power2.out" });
-        phoneInput.focus();
-      } else {
-        gsap.to(phoneInputWrapper, {
-          duration: 0.3,
-          width: 0,
-          ease: "power2.in",
-          onComplete: () => {
-            phoneInputWrapper.classList.remove('active');
-            phoneInput.disabled = true;
-            phoneInput.value = '';
-          }
+    const deliveryBtn = document.querySelector('.toggle-switch .btn-dark');
+    const pickupBtn = document.querySelector('.toggle-switch .btn-light');
+    
+    if (deliveryBtn && pickupBtn) {
+        deliveryBtn.addEventListener('click', () => {
+            if (!deliveryBtn.classList.contains('active')) {
+                deliveryBtn.classList.add('active');
+                pickupBtn.classList.remove('active');
+                document.querySelector('.delivery-address').style.display = 'block';
+            }
         });
-      }
-      phoneVisible = !phoneVisible;
-    });
-  });  
+        
+        pickupBtn.addEventListener('click', () => {
+            if (!pickupBtn.classList.contains('active')) {
+                pickupBtn.classList.add('active');
+                deliveryBtn.classList.remove('active');
+                document.querySelector('.delivery-address').style.display = 'none';
+            }
+        });
+    }
 });
 
-
+// Initialize the order page
 renderOrder();

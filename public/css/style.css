@@ -2,25 +2,25 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
 }
 
 /* 🩷 Рожевий хедер */
 .header {
-  background-color: #f88a9a;
+  background-color: #FE9A9B;
   padding: 15px;
   color: rgb(0, 0, 0);
 }
 
 body {
-  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9ecec;
   color: #333;
-  background-image: url("../images/background.png");
-  background-size: cover;
-  position: relative;
+  line-height: 1.6;
   overflow-x: hidden;
-  background-attachment: local;
+  width: 100%;
+  margin: 0;
+  padding: 0;
 }
-
 
 .header {
   background-color: #f88a9a;
@@ -66,119 +66,220 @@ body {
   text-decoration: underline;
 }
 
-.cart-icon {
-  width: 32px;
-  height: 32px;
-  object-fit: cover;
-  cursor: pointer;
-  margin-left: 10px;
-}
 .cart-link {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.cart-link:hover {
+  transform: translateY(-2px);
+}
+
+.cart-icon {
+  width: 24px;
+  height: 24px;
+  filter: brightness(0) invert(1);
 }
 
 .search-bar {
   text-align: center;
-  margin: 15px 0;
+  margin: 15px auto;
+  width: 450px;
+}
+
+.search-bar input {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 5px 20px;
+  width: 100%;
+  height: 40px;
+  font-size: 14px;
+  outline: none;
 }
 
 .top-header {
-  background-color: #f88a9a;
+  background: linear-gradient(to right, #FE9A9B, #ff8182);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 25px;
+  padding: 15px 40px;
   font-size: 14px;
-  color: #510b31;
-  flex-wrap: wrap;
+  color: #333;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
-
 
 .left-side .work-hours {
   display: flex;
-  align-items: left;
-  font-weight: bold;
-  gap: 5px;
-  white-space: nowrap;
-  padding: 10px;
-  flex-direction: column;
-  line-height: 1.2;
+  align-items: center;
+  font-weight: 500;
+  gap: 8px;
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 16px;
+  border-radius: 30px;
+  backdrop-filter: blur(5px);
+}
+
+.left-side .work-hours strong {
+  font-weight: 600;
+}
+
+.center-side {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .center-side .site-name {
-  font-size: 20px;
-  font-weight: 600;
-  font-family: 'Montserrat';
+  font-size: 28px;
+  font-weight: 700;
+  font-family: 'Roboto', sans-serif;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 8px 24px;
+  border-radius: 30px;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.center-side .site-name:hover {
+  transform: translateY(-2px);
+  text-shadow: 3px 3px 6px rgba(0,0,0,0.2);
 }
 
 .right-side {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
 }
 
+/* Improved delivery toggle */
 .delivery-toggle {
-  background: #f1b1b1;
-  padding: 2px;
-  border-radius: 20px;
+  background: transparent;
+  padding: 3px;
+  border-radius: 30px;
   display: flex;
+  gap: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .delivery-toggle button {
   background: transparent;
   border: none;
-  padding: 5px 10px;
-  border-radius: 20px;
+  padding: 8px 20px;
+  border-radius: 28px;
   cursor: pointer;
-  font-weight: bold;
-  color: #444444;
+  font-size: 14px;
+  color: white;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  min-width: 100px;
+  text-align: center;
 }
 
-.delivery-toggle .active {
-  background-color: #fff;
+.delivery-toggle button.active {
+  background: white;
+  color: #FE9A9B;
+}
+
+/* Hover effect only for inactive button */
+.delivery-toggle button:not(.active):hover {
+  background: rgba(255, 255, 255, 0.1);
 }
 
 .city-select {
-  padding: 5px;
-  border-radius: 6px;
-  border: none;
+  padding: 8px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 14px;
+  cursor: pointer;
+  color: white;
+  font-weight: 500;
+  width: 180px;
+  height: 40px;
+  appearance: none;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+  background-repeat: no-repeat;
+  background-position: right 15px center;
 }
 
-.login-link {
-  font-weight: bold;
+.city-select:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.city-select option {
+  background: white;
+  color: #333;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.auth-buttons .btn {
+  padding: 8px 20px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
   text-decoration: none;
-  color: #222;
+  border-radius: 30px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.login-link:hover {
-  text-decoration: underline;
+.auth-buttons .btn:last-child {
+  background: white;
+  color: #FE9A9B;
 }
 
+.auth-buttons .btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+}
+
+.auth-buttons .btn:last-child:hover {
+  background: rgba(255, 255, 255, 0.9);
+}
 
 /* 🔲 Заголовки секцій */
 .popular h2, .all-places h2 {
-  background-color: rgba(255, 255, 255, 0.75);
-  text-align: left;
-  font-style: italic;
-  font-size: 24px;
-  padding: 10px 20px;
-  margin: 20px 0 10px 20px;
-  border-radius: 10px;
-  width: fit-content;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-}
-
-
-.search-bar {
+  background-color: transparent;
   text-align: center;
-  margin-top: 10px;
+  font-size: 28px;
+  font-weight: 500;
+  padding: 20px;
+  margin: 20px auto;
+  color: #333;
+  position: relative;
+  box-shadow: none;
+  max-width: 1400px;
 }
 
-.search-bar input {
-  padding: 8px 16px;
-  width: 60%;
-  border-radius: 20px;
-  border: 1px solid #ccc;
+.popular h2::after, .all-places h2::after {
+  content: '';
+  position: absolute;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 3px;
+  background-color: #FE9A9B;
+  border-radius: 2px;
 }
 
 .banner {
@@ -190,51 +291,82 @@ body {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  padding: 10px;
-  background: #f5f5f5;
+  padding: 20px;
+  background: #f9ecec;
+  gap: 10px;
 }
 
 .categories button {
-  margin: 5px;
-  padding: 10px 15px;
-  background-color: #fff;
+  margin: 0;
+  padding: 10px 20px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 20px;
+  background: #fff;
   cursor: pointer;
-  transition: background 0.3s;
+  font-size: 14px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .categories button:hover {
-  background-color: #ffe0e0;
+  background-color: #FE9A9B;
+  color: white;
+  border-color: #FE9A9B;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .filters {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 10px;
-  margin: 20px;
+  gap: 15px;
+  margin: 30px 20px;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
 }
 
 .filters select {
-  padding: 8px;
-  border-radius: 6px;
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  min-width: 200px;
+  height: 40px;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: all 0.3s ease;
+}
+
+.filters select:hover {
+  border-color: #FE9A9B;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.filters select:focus {
+  outline: none;
+  border-color: #FE9A9B;
+  box-shadow: 0 2px 8px rgba(254, 154, 155, 0.25);
 }
 
 .btn-reset {
-  background-color: #ffffff;
-  color: rgb(0, 0, 0);
-  border: none;
-  padding: 8px 12px;
-  font-size: 14px;
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  background: #fff;
   cursor: pointer;
-  border-radius: 6px;
-  border: 1px solid #918f8f;
-  
+  font-size: 14px;
+  transition: background-color 0.3s ease;
 }
 
 .btn-reset:hover {
-  background-color: #edd2d2;
+  background-color: #f0f0f0;
 }
 
 /* 🎠 Карусель популярних */
@@ -271,23 +403,60 @@ body {
 }
 
 .card, .restaurant {
-  width: 200px;
-  background: #fff;
-  border-radius: 12px;
+  position: relative;
+  width: 360px;
+  height: 240px;
+  background: white;
+  border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.card:hover, .restaurant:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.12);
 }
 
 .card img, .restaurant img {
   width: 100%;
-  height: 150px;
+  height: 200px;
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.card:hover img, .restaurant:hover img {
+  transform: scale(1.08);
+}
+
+.card::after, .restaurant::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0) 60%,
+    rgba(0,0,0,0.05) 100%
+  );
+  pointer-events: none;
+}
+
+.card p, .restaurant p {
+  padding: 15px;
+  font-weight: 500;
+  color: #333;
+  font-size: 16px;
 }
 
 .restaurant-link {
   text-decoration: none;
   color: inherit;
+  display: block;
+  width: 360px;
 }
 
 .restaurant-link:hover {
@@ -295,47 +464,279 @@ body {
   color: inherit;
 }
 
+.rating-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  padding: 4px 8px;
+  border-radius: 100px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.rating-badge::before {
+  content: "★";
+  color: #FF5A5F;
+  font-size: 14px;
+  margin-right: 2px;
+}
+
+.card:hover .rating-badge,
+.restaurant:hover .rating-badge {
+  opacity: 1;
+  background: white;
+  color: #333;
+}
+
+.card:hover .rating-badge::before,
+.restaurant:hover .rating-badge::before {
+  color: #FF5A5F;
+}
+
+.card-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  background: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.card-content-left {
+  flex: 1;
+}
+
+.card-content p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.card-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  gap: 8px;
+}
+
+.cuisine-type {
+  background: rgba(254, 154, 155, 0.1);
+  color: #FE9A9B;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.card:hover .cuisine-type,
+.restaurant:hover .cuisine-type {
+  background: rgba(254, 154, 155, 0.2);
+}
+
+.delivery-time {
+  color: #666;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.delivery-time::before {
+  content: '🕒';
+  font-size: 12px;
+}
+
+.arrow-icon {
+  font-size: 22px;
+  color: #FE9A9B;
+  opacity: 0.7;
+  transition: all 0.4s ease;
+  background: rgba(254, 154, 155, 0.1);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.card:hover .arrow-icon {
+  color: #FE9A9B;
+  transform: translateX(5px);
+  opacity: 1;
+  background: rgba(254, 154, 155, 0.2);
+}
+
+.popular {
+  margin: 40px auto;
+  max-width: 1400px;
+  padding: 0 20px;
+  width: 100%;
+}
 
 .carousel-container {
   position: relative;
-  width: 90%;
-  margin: auto;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
   overflow: hidden;
+  padding: 0 40px;
 }
 
 .carousel-track {
   display: flex;
-  transition: transform 0.5s ease;
+  transition: transform 0.5s ease-in-out;
+  gap: 24px;
 }
 
 .carousel-slide {
-  min-width: 100%;
   display: flex;
-  justify-content: space-around;
-  gap: 20px;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.carousel-slide .restaurant-link {
+  width: 360px;
+  min-width: 360px;
+  max-width: 360px;
+}
+
+.carousel-slide .card {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+  transition: all 0.4s ease;
+  position: relative;
+  border: 1px solid rgba(254, 154, 155, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.carousel-slide .card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 35px rgba(254, 154, 155, 0.15);
+  border-color: rgba(254, 154, 155, 0.3);
+}
+
+.carousel-slide .card img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.carousel-slide .card:hover img {
+  transform: scale(1.08);
+}
+
+.carousel-slide .card .rating-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 6px 12px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.carousel-slide .card .rating-badge::before {
+  content: '★';
+  color: #FE9A9B;
+}
+
+.carousel-slide .card:hover .rating-badge {
+  background: #FE9A9B;
+  color: white;
+}
+
+.carousel-slide .card:hover .rating-badge::before {
+  color: white;
+}
+
+.carousel-slide .card .card-content {
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  margin-top: auto;
+}
+
+.carousel-slide .card .card-content p {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2d3436;
+  margin: 0;
+}
+
+.carousel-slide .card .arrow-icon {
+  font-size: 20px;
+  color: #FE9A9B;
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.carousel-slide .card:hover .arrow-icon {
+  transform: translateX(5px);
+  opacity: 1;
 }
 
 .carousel-btn {
   position: absolute;
-  top: 40%;
+  top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(255,255,255,0.7);
+  width: 40px;
+  height: 40px;
   border: none;
-  font-size: 30px;
-  cursor: pointer;
-  z-index: 10;
-  padding: 10px 15px;
   border-radius: 50%;
+  background: white;
+  color: #333;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 3;
+  transition: all 0.3s ease;
+}
+
+.carousel-btn:hover {
+  background: #FF5A5F;
+  color: white;
 }
 
 .carousel-btn.left {
-  left: 0;
+  left: 10px;
 }
 
 .carousel-btn.right {
-  right: 0;
+  right: 10px;
 }
-
 
 footer {
   background: #f88a9a;
@@ -384,23 +785,455 @@ footer {
   cursor: pointer;
 }
 
-
-.auth-buttons {
-  display: flex;
-  gap: 10px;
+/* Стилі для секції "Усі заклади" */
+.restaurants {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 360px);
+  gap: 24px;
+  padding: 20px;
+  margin: 0 auto;
+  max-width: 1400px;
+  justify-content: center;
 }
 
-.auth-buttons .btn {
-  padding: 8px 12px;
-  background-color: #c01272;
-  color: white;
+.restaurants .restaurant-link {
   text-decoration: none;
-  border-radius: 6px;
-  font-weight: bold;
-  transition: background-color 0.3s ease;
-  font-size: 14px;
+  color: inherit;
+  display: block;
+  height: 100%;
 }
 
-.auth-buttons .btn:hover {
-  background-color: #8e388a;
+.restaurants .restaurant {
+  width: 100%;
+  height: 400px;
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+  transition: all 0.4s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border: 1px solid rgba(254, 154, 155, 0.1);
+}
+
+.restaurants .restaurant:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 35px rgba(254, 154, 155, 0.15);
+  border-color: rgba(254, 154, 155, 0.3);
+}
+
+.restaurants .restaurant img {
+  width: 100%;
+  height: 250px;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.restaurants .restaurant:hover img {
+  transform: scale(1.08);
+}
+
+.restaurants .restaurant .rating-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 6px 12px 6px 28px;
+  border-radius: 30px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.restaurants .restaurant .rating-badge::before {
+  content: '★';
+  position: absolute;
+  left: 12px;
+  color: #FE9A9B;
+}
+
+.restaurants .restaurant:hover .rating-badge {
+  background: #FE9A9B;
+  color: white;
+  padding-right: 18px;
+}
+
+.restaurants .restaurant:hover .rating-badge::before {
+  color: white;
+}
+
+.restaurants .restaurant .card-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: white;
+  flex: 1;
+}
+
+.restaurants .restaurant .card-content p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3436;
+  margin: 0;
+  text-align: left;
+}
+
+.restaurants .restaurant .card-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 5px;
+}
+
+.restaurants .restaurant .cuisine-type {
+  background: rgba(254, 154, 155, 0.1);
+  color: #FE9A9B;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.restaurants .restaurant:hover .cuisine-type {
+  background: rgba(254, 154, 155, 0.2);
+}
+
+.restaurants .restaurant .delivery-time {
+  color: #666;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.restaurants .restaurant .delivery-time::before {
+  content: '🕒';
+  font-size: 12px;
+}
+
+.banner-carousel {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: 20px auto;
+  overflow: hidden;
+  border-radius: 16px;
+}
+
+.banner-track {
+  display: flex;
+  transition: transform 0.5s ease;
+}
+
+.banner-slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  height: 300px;
+  display: flex;
+  padding: 0 40px;
+  position: relative;
+}
+
+.banner-content {
+  flex: 1;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  z-index: 1;
+}
+
+.banner-content h2 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.banner-content p {
+  font-size: 18px;
+  margin-bottom: 24px;
+  color: #666;
+}
+
+.banner-btn {
+  display: inline-block;
+  padding: 12px 24px;
+  background: #FE9A9B;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: fit-content;
+}
+
+.banner-btn:hover {
+  background: #ff8182;
+  transform: translateY(-2px);
+}
+
+.banner-image {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.banner-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+
+.banner-nav:hover {
+  background: #FE9A9B;
+  color: white;
+}
+
+.banner-nav.prev {
+  left: 20px;
+}
+
+.banner-nav.next {
+  right: 20px;
+}
+
+/* About and FAQ page styles */
+.about-content, .faq-content {
+    padding: 40px 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.about-hero, .faq-hero {
+    text-align: center;
+    margin-bottom: 60px;
+    background: linear-gradient(135deg, #FE9A9B 0%, #FE787A 100%);
+    padding: 60px 20px;
+    border-radius: 12px;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.about-hero h1, .faq-hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.subtitle {
+    font-size: 18px;
+    opacity: 0.9;
+}
+
+.about-section, .faq-category {
+    margin-bottom: 60px;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.about-section h2, .faq-category h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #333;
+    border-bottom: 2px solid #FE787A;
+    padding-bottom: 10px;
+}
+
+.about-section p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666;
+    max-width: 800px;
+}
+
+.advantages-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.advantage-card {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    text-align: center;
+    transition: transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.advantage-card:hover {
+    transform: translateY(-5px);
+}
+
+.advantage-card img {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+}
+
+.advantage-card h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: #333;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.step {
+    text-align: center;
+    padding: 24px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.step-number {
+    width: 40px;
+    height: 40px;
+    background: #FE787A;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-weight: bold;
+}
+
+/* FAQ specific styles */
+.faq-item {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: transform 0.3s ease;
+}
+
+.faq-item:hover {
+    transform: translateX(5px);
+}
+
+.faq-item h3 {
+    font-size: 18px;
+    margin-bottom: 12px;
+    color: #333;
+    font-weight: 500;
+}
+
+.faq-item p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #666;
+}
+
+/* Navigation styles */
+.nav-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+.back-btn {
+    padding: 8px 16px;
+    background: #FE787A;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.back-btn:hover {
+    background: #fe6a6c;
+}
+
+.nav-items {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.address-select {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+}
+
+.cart-icon, .profile-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .nav-items {
+        gap: 10px;
+    }
+    
+    .about-hero h1, .faq-hero h1 {
+        font-size: 28px;
+    }
+    
+    .about-section, .faq-category {
+        padding: 20px;
+    }
+    
+    .advantages-grid, .steps {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Add padding to main content to account for fixed navbar */
+.about-content, .faq-content {
+    padding-top: 100px;
 }

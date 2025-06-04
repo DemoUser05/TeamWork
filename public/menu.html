@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>БАШУ DOSE - Меню</title>
+    <title>Дрібка Смаку - Меню</title>
     <link rel="stylesheet" href="css/menustyle.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="js/cartService.js"></script>
     <script src="js/menu.js" defer></script>
 </head>
 <body>
@@ -41,20 +42,22 @@
                 </div>
             </div>
             <div class="delivery-options">
-                <span class="delivery active">Доставка</span>
-                <span class="pickup inactive">Самовивіз</span>
+                <div class="delivery-toggle">
+                    <button class="delivery active">Доставка</button>
+                    <button class="pickup">Самовивіз</button>
+                </div>
             </div>
         </header>
         
         <main class="main-content">
             <section class="special-offers">
                 <div class="filters">
-                    <button class="filter-btn" id="filter-btn">Фільтр</button>
-                    <select class="sort-select" id="sort-select">
-                        <option value="popularity-desc">Сортувати за популярністю: від високої до низької</option>
-                        <option value="popularity-asc">Сортувати за популярністю: від низької до високої</option>
-                        <option value="price-asc">Сортувати за ціною: від низької до високої</option>
-                        <option value="price-desc">Сортувати за ціною: від високої до низької</option>
+                    <button id="filter-btn" class="filter-btn">Фільтр</button>
+                    <select id="sort-select" class="sort-select">
+                        <option value="popularity-desc">За популярністю</option>
+                        <option value="price-asc">Від дешевих до дорогих</option>
+                        <option value="price-desc">Від дорогих до дешевих</option>
+                        <option value="popularity-asc">За рейтингом (за зростанням)</option>
                     </select>
                 </div>
                 <h2>Найкращі пропозиції</h2>

@@ -7,7 +7,7 @@ const restaurants = [
   { id: "4", name: "Levova Paliantysia", category: ["салат", "піца", "сніданок", "напої"], city: "Львів", rating: 4.7, deliveryTime: 25, avgPrice: 120, tags: ["халяль"], promo: false, img: "images/levova_paliantysia.png" },
 
   { id: "5", name: "Burger Star", category: ["бургер","напої", "салат", "фастфуд"], city: "Черкаси", rating: 4.7, deliveryTime: 30, avgPrice: 200, tags: [], promo: true, img: "images/burger_star.jpg" },
-  { id: "6", name: "SHOco", category: ["кексик", "напої"], city: "Львів",  promo: false, rating: 4.2, deliveryTime: 50, avgPrice: 160, tags: ["без глютену", "веганське"], img: "images/shoco.jpg" },
+  { id: "6", name: "SHOco", category: ["кексик", "напої"], city: "Львів",  promo: false, rating: 4.2, deliveryTime: 50, avgPrice: 160, tags: ["без глютену", "веганське"], img: "images/shoco.jpeg" },
   { id: "7", name: "Noa", category: ["суші", "напої", "салат"], city: ["Львів", "Черкаси"], promo: false, rating: 4.8, deliveryTime: 40, avgPrice: 350, tags: ["веганське"], img: "images/noa.webp" },
   { id: "8", name: "Pasta Fresca", category: ["паста", "сніданок", "напої", "кексик"], city: "Дрогобич", promo: true, rating: 3.8, deliveryTime: 45, avgPrice: 210, tags: ["без глютену", "веганське"], img: "images/pasta_fresca.jpeg" },
 
@@ -71,23 +71,71 @@ document.querySelectorAll(".filters select")[3].addEventListener("change", funct
   }
 });
 
-let currentSlide = 0;
-const slides = document.querySelectorAll(".carousel-slide");
+// Carousel functionality
+const track = document.querySelector('.carousel-track');
+const slides = document.querySelectorAll('.carousel-slide');
+const nextButton = document.querySelector('.carousel-btn.right');
+const prevButton = document.querySelector('.carousel-btn.left');
+let currentIndex = 0;
 
-function showSlide(index) {
-  const track = document.getElementById("carousel-track");
-  const slideWidth = slides[0].offsetWidth;
-  track.style.transform = `translateX(-${index * slideWidth}px)`;
+function updateCarousel() {
+    const slideWidth = slides[0].getBoundingClientRect().width;
+    track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
 }
 
-function nextSlide() {
-  currentSlide = (currentSlide + 1) % slides.length;
-  showSlide(currentSlide);
-}
+// Initialize carousel
+if (track && slides.length > 0) {
+    // Set initial position
+    updateCarousel();
 
-function prevSlide() {
-  currentSlide = (currentSlide - 1 + slides.length) % slides.length;
-  showSlide(currentSlide);
+    // Add click handlers for next/prev buttons
+    if (nextButton) {
+        nextButton.addEventListener('click', () => {
+            if (currentIndex < slides.length - 1) {
+                currentIndex++;
+                updateCarousel();
+            }
+        });
+    }
+
+    if (prevButton) {
+        prevButton.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCarousel();
+            }
+        });
+    }
+
+    // Update on window resize
+    window.addEventListener('resize', updateCarousel);
+
+    // Optional: Add touch support
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    track.addEventListener('touchstart', (e) => {
+        touchStartX = e.touches[0].clientX;
+    });
+
+    track.addEventListener('touchmove', (e) => {
+        touchEndX = e.touches[0].clientX;
+    });
+
+    track.addEventListener('touchend', () => {
+        const difference = touchStartX - touchEndX;
+        if (Math.abs(difference) > 50) { // Minimum swipe distance
+            if (difference > 0 && currentIndex < slides.length - 1) {
+                // Swipe left
+                currentIndex++;
+                updateCarousel();
+            } else if (difference < 0 && currentIndex > 0) {
+                // Swipe right
+                currentIndex--;
+                updateCarousel();
+            }
+        }
+    });
 }
 
 function applyFilters(extra = {}) {
@@ -147,7 +195,7 @@ function applyFilters(extra = {}) {
 }
 
 
-// 🟰 Прив’язуємо всі селекти
+// 🟰 Прив'язуємо всі селекти
 document.querySelectorAll(".filters select").forEach(sel => {
   sel.addEventListener("change", applyFilters);
 });
@@ -225,3 +273,113 @@ document.getElementById("reset-filters").addEventListener("click", () => {
   
   renderRestaurants(restaurants); // Повертає стандартний список ресторанів
 });
+
+// Банери для каруселі
+const banners = [
+  {
+    title: "Спробуйте нові сніданки в Daily Dose",
+    subtitle: "Спеціальна пропозиція",
+    buttonText: "Замовити",
+    bgColor: "#FFE8E8",
+    image: "images/banner1.jpg"
+  },
+  {
+    title: "Доставка улюблених страв",
+    subtitle: "Отримайте знижку 20%",
+    buttonText: "Дізнатись більше",
+    bgColor: "#FFF3E0",
+    image: "images/banner2.jpg"
+  },
+  {
+    title: "Святкові страви",
+    subtitle: "Замовляйте заздалегідь",
+    buttonText: "Переглянути меню",
+    bgColor: "#E8F5E9",
+    image: "images/banner3.jpg"
+  }
+];
+
+// Створюємо HTML для банерів
+function createBannerHTML() {
+  const container = document.querySelector('.banner-carousel');
+  if (!container) return;
+
+  const track = document.createElement('div');
+  track.className = 'banner-track';
+
+  banners.forEach(banner => {
+    const slide = document.createElement('div');
+    slide.className = 'banner-slide';
+    slide.style.backgroundColor = banner.bgColor;
+    
+    slide.innerHTML = `
+      <div class="banner-content">
+        <h2>${banner.title}</h2>
+        <p>${banner.subtitle}</p>
+        <button class="banner-btn">${banner.buttonText}</button>
+      </div>
+      <div class="banner-image">
+        <img src="${banner.image}" alt="${banner.title}">
+      </div>
+    `;
+    
+    track.appendChild(slide);
+  });
+
+  // Додаємо кнопки навігації
+  const prevBtn = document.createElement('button');
+  prevBtn.className = 'banner-nav prev';
+  prevBtn.innerHTML = '&#10094;';
+
+  const nextBtn = document.createElement('button');
+  nextBtn.className = 'banner-nav next';
+  nextBtn.innerHTML = '&#10095;';
+
+  container.appendChild(track);
+  container.appendChild(prevBtn);
+  container.appendChild(nextBtn);
+
+  return { track, prevBtn, nextBtn };
+}
+
+// Ініціалізація каруселі банерів
+function initBannerCarousel() {
+  const elements = createBannerHTML();
+  if (!elements) return;
+
+  const { track, prevBtn, nextBtn } = elements;
+  let currentSlide = 0;
+
+  function updateSlide() {
+    const slideWidth = track.querySelector('.banner-slide').offsetWidth;
+    track.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % banners.length;
+    updateSlide();
+  }
+
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + banners.length) % banners.length;
+    updateSlide();
+  }
+
+  nextBtn.addEventListener('click', nextSlide);
+  prevBtn.addEventListener('click', prevSlide);
+
+  // Автоматична прокрутка
+  let autoplay = setInterval(nextSlide, 5000);
+
+  // Зупиняємо автопрокрутку при наведенні
+  track.addEventListener('mouseenter', () => clearInterval(autoplay));
+  track.addEventListener('mouseleave', () => {
+    autoplay = setInterval(nextSlide, 5000);
+  });
+
+  // Оновлюємо при зміні розміру вікна
+  window.addEventListener('resize', updateSlide);
+}
+
+// Викликаємо ініціалізацію після завантаження сторінки
+document.addEventListener('DOMContentLoaded', initBannerCarousel);

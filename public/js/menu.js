@@ -181,6 +181,164 @@ if (restaurantData[restaurantId]) {
     document.getElementById("restaurant-image").src = restaurantData[restaurantId].image;
 }
 
+// Initialize cart service
+const cartService = new CartService();
+
+// Update cart icon click handler
+document.addEventListener('DOMContentLoaded', () => {
+    const cartIcon = document.querySelector('.cart-icon');
+    if (cartIcon) {
+        cartIcon.addEventListener('click', () => {
+            window.location.href = 'order.html';
+        });
+    }
+
+    // Initialize menu items
+    renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
+    renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
+
+    // Initialize filter button
+    const filterBtn = document.getElementById("filter-btn");
+    if (filterBtn) {
+        filterBtn.addEventListener("click", () => {
+            const filterModal = document.createElement("div");
+            filterModal.classList.add("modal");
+            filterModal.innerHTML = `
+                <div class="modal-content filter-modal-content">
+                    <span class="close-modal">×</span>
+                    <h2>Фільтри</h2>
+                    <div class="filter-section">
+                        <h3>Категорія</h3>
+                        <label><input type="checkbox" class="filter-checkbox" data-filter="category" value="М'ясо"> М'ясо</label>
+                        <label><input type="checkbox" class="filter-checkbox" data-filter="category" value="Десерти"> Десерти</label>
+                        <label><input type="checkbox" class="filter-checkbox" data-filter="category" value="Фастфуд"> Фастфуд</label>
+                    </div>
+                    <div class="filter-section">
+                        <h3>Діапазон цін</h3>
+                        <label>Від: <input type="number" id="price-min" value="0" min="0"></label>
+                        <label>До: <input type="number" id="price-max" value="1000" min="0"></label>
+                    </div>
+                    <div class="filter-section">
+                        <h3>Рейтинг</h3>
+                        <label>Вище: <input type="number" id="rating-min" value="80" min="0" max="100">%</label>
+                    </div>
+                    <button id="apply-filters">Застосувати</button>
+                    <button id="reset-filters">Скинути</button>
+                </div>
+            `;
+            document.body.appendChild(filterModal);
+            filterModal.classList.add("show");
+
+            const closeButton = filterModal.querySelector(".close-modal");
+            closeButton.addEventListener("click", () => {
+                filterModal.classList.remove("show");
+                setTimeout(() => filterModal.remove(), 300);
+            });
+
+            filterModal.addEventListener("click", (e) => {
+                if (e.target === filterModal) {
+                    filterModal.classList.remove("show");
+                    setTimeout(() => filterModal.remove(), 300);
+                }
+            });
+
+            const applyFiltersBtn = filterModal.querySelector("#apply-filters");
+            applyFiltersBtn.addEventListener("click", () => {
+                const selectedCategories = Array.from(filterModal.querySelectorAll(".filter-checkbox:checked"))
+                    .map(checkbox => checkbox.value);
+                const priceMin = parseInt(filterModal.querySelector("#price-min").value) || 0;
+                const priceMax = parseInt(filterModal.querySelector("#price-max").value) || Infinity;
+                const ratingMin = parseInt(filterModal.querySelector("#rating-min").value) || 0;
+
+                filteredSpecialOffers = specialOffers.filter(item => {
+                    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
+                    const matchesPrice = item.price >= priceMin && item.price <= priceMax;
+                    const rating = parseInt(item.rating.match(/\d+/)[0]);
+                    const matchesRating = rating >= ratingMin;
+                    return matchesCategory && matchesPrice && matchesRating;
+                });
+
+                filteredFullMenu = fullMenu.filter(item => {
+                    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
+                    const matchesPrice = item.price >= priceMin && item.price <= priceMax;
+                    const rating = parseInt(item.rating.match(/\d+/)[0]);
+                    const matchesRating = rating >= ratingMin;
+                    return matchesCategory && matchesPrice && matchesRating;
+                });
+
+                filteredSpecialOffers = applySort(filteredSpecialOffers);
+                filteredFullMenu = applySort(filteredFullMenu);
+                renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
+                renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
+                filterModal.classList.remove("show");
+                setTimeout(() => filterModal.remove(), 300);
+            });
+
+            const resetFiltersBtn = filterModal.querySelector("#reset-filters");
+            resetFiltersBtn.addEventListener("click", () => {
+                filterModal.querySelectorAll(".filter-checkbox").forEach(checkbox => checkbox.checked = false);
+                filterModal.querySelector("#price-min").value = 0;
+                filterModal.querySelector("#price-max").value = 1000;
+                filterModal.querySelector("#rating-min").value = 80;
+                filteredSpecialOffers = [...specialOffers];
+                filteredFullMenu = [...fullMenu];
+                filteredSpecialOffers = applySort(filteredSpecialOffers);
+                filteredFullMenu = applySort(filteredFullMenu);
+                renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
+                renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
+            });
+        });
+    }
+
+    // Initialize sort select
+    const sortSelect = document.getElementById("sort-select");
+    if (sortSelect) {
+        sortSelect.addEventListener("change", () => {
+            currentSortOption = sortSelect.value;
+            filteredSpecialOffers = applySort(filteredSpecialOffers);
+            filteredFullMenu = applySort(filteredFullMenu);
+            renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
+            renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
+        });
+    }
+
+    // Initialize search
+    const searchInput = document.getElementById("search-input");
+    if (searchInput) {
+        searchInput.addEventListener("input", () => {
+            const searchTerm = searchInput.value.toLowerCase();
+            filteredSpecialOffers = specialOffers.filter(item => 
+                item.name.toLowerCase().includes(searchTerm) || 
+                item.description.toLowerCase().includes(searchTerm)
+            );
+            filteredFullMenu = fullMenu.filter(item => 
+                item.name.toLowerCase().includes(searchTerm) || 
+                item.description.toLowerCase().includes(searchTerm)
+            );
+            filteredSpecialOffers = applySort(filteredSpecialOffers);
+            filteredFullMenu = applySort(filteredFullMenu);
+            renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
+            renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
+        });
+    }
+
+    // Delivery/Pickup toggle
+    const deliveryBtn = document.querySelector('.delivery');
+    const pickupBtn = document.querySelector('.pickup');
+
+    if (deliveryBtn && pickupBtn) {
+        deliveryBtn.addEventListener('click', () => {
+            deliveryBtn.classList.add('active');
+            pickupBtn.classList.remove('active');
+        });
+
+        pickupBtn.addEventListener('click', () => {
+            pickupBtn.classList.add('active');
+            deliveryBtn.classList.remove('active');
+        });
+    }
+});
+
 function createMenuItem(item) {
     const div = document.createElement("div");
     div.classList.add("menu-item");
@@ -212,9 +370,6 @@ function renderMenuItems(items, container) {
     });
 }
 
-const specialOffersContainer = document.getElementById("special-offers-items");
-const fullMenuContainer = document.getElementById("full-menu-items");
-
 let filteredSpecialOffers = [...specialOffers];
 let filteredFullMenu = [...fullMenu];
 let currentSortOption = "popularity-desc"; // Змінено початкове значення за замовчуванням
@@ -237,223 +392,141 @@ function applySort(items) {
     }
 }
 
-renderMenuItems(filteredSpecialOffers, specialOffersContainer);
-renderMenuItems(filteredFullMenu, fullMenuContainer);
+function openModal(item) {
+    const existingModal = document.querySelector('.menu-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
 
-const searchInput = document.getElementById("search-input");
-searchInput.addEventListener("input", () => {
-    const searchTerm = searchInput.value.toLowerCase();
-    filteredSpecialOffers = specialOffers.filter(item => 
-        item.name.toLowerCase().includes(searchTerm) || 
-        item.description.toLowerCase().includes(searchTerm)
-    );
-    filteredFullMenu = fullMenu.filter(item => 
-        item.name.toLowerCase().includes(searchTerm) || 
-        item.description.toLowerCase().includes(searchTerm)
-    );
-    filteredSpecialOffers = applySort(filteredSpecialOffers);
-    filteredFullMenu = applySort(filteredFullMenu);
-    renderMenuItems(filteredSpecialOffers, specialOffersContainer);
-    renderMenuItems(filteredFullMenu, fullMenuContainer);
-});
+    const modal = document.createElement('div');
+    modal.className = 'menu-modal';
+    modal.innerHTML = `
+        <div class="menu-modal-content">
+            <div class="menu-modal-header">
+                <h3>${item.name}</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="menu-modal-body">
+                <div class="modal-left">
+                    <img src="${item.image}" alt="${item.name}" class="modal-image">
+                    <p class="modal-description">${item.description}</p>
+                </div>
+                <div class="modal-info">
+                    <div class="modal-price-container">
+                        <div class="modal-price">${item.price} грн</div>
+                    </div>
+                    
+                    ${item.extras && item.extras.length ? `
+                        <div class="extras-section">
+                            <h4>Додаткові опції</h4>
+                            <div class="extras-list">
+                                ${item.extras.map(extra => `
+                                    <div class="extra-item">
+                                        <label>${extra.name}</label>
+                                        <div class="extra-price">
+                                            <span>${extra.price} грн</span>
+                                            <button class="add-extra" data-name="${extra.name}" data-price="${extra.price}">+</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
 
-const sortSelect = document.getElementById("sort-select");
-sortSelect.addEventListener("change", () => {
-    currentSortOption = sortSelect.value;
-    filteredSpecialOffers = applySort(filteredSpecialOffers);
-    filteredFullMenu = applySort(filteredFullMenu);
-    renderMenuItems(filteredSpecialOffers, specialOffersContainer);
-    renderMenuItems(filteredFullMenu, fullMenuContainer);
-});
+                    <div class="special-instructions">
+                        <h4>Спеціальні інструкції</h4>
+                        <textarea placeholder="Додайте примітку"></textarea>
+                    </div>
 
-const filterBtn = document.getElementById("filter-btn");
-filterBtn.addEventListener("click", () => {
-    const filterModal = document.createElement("div");
-    filterModal.classList.add("modal");
-    filterModal.innerHTML = `
-        <div class="modal-content filter-modal-content">
-            <span class="close-modal">×</span>
-            <h2>Фільтри</h2>
-            <div class="filter-section">
-                <h3>Категорія</h3>
-                <label><input type="checkbox" class="filter-checkbox" data-filter="category" value="М'ясо"> М'ясо</label>
-                <label><input type="checkbox" class="filter-checkbox" data-filter="category" value="Десерти"> Десерти</label>
-                <label><input type="checkbox" class="filter-checkbox" data-filter="category" value="Фастфуд"> Фастфуд</label>
+                    <div class="quantity-control">
+                        <button class="quantity-btn minus">-</button>
+                        <span class="quantity">1</span>
+                        <button class="quantity-btn plus">+</button>
+                        <button class="add-to-cart-btn">Додати до замовлення</button>
+                    </div>
+                </div>
             </div>
-            <div class="filter-section">
-                <h3>Діапазон цін</h3>
-                <label>Від: <input type="number" id="price-min" value="0" min="0"></label>
-                <label>До: <input type="number" id="price-max" value="1000" min="0"></label>
-            </div>
-            <div class="filter-section">
-                <h3>Рейтинг</h3>
-                <label>Вище: <input type="number" id="rating-min" value="80" min="0" max="100">%</label>
-            </div>
-            <button id="apply-filters">Застосувати</button>
-            <button id="reset-filters">Скинути</button>
         </div>
     `;
-    document.body.appendChild(filterModal);
 
-    const closeButton = filterModal.querySelector(".close-modal");
-    closeButton.addEventListener("click", () => {
-        filterModal.classList.add("fade-out");
-        setTimeout(() => filterModal.remove(), 300);
-    });
+    document.body.appendChild(modal);
+    setTimeout(() => modal.classList.add('show'), 10);
 
-    filterModal.addEventListener("click", (e) => {
-        if (e.target === filterModal) {
-            filterModal.classList.add("fade-out");
-            setTimeout(() => filterModal.remove(), 300);
+    let quantity = 1;
+    let selectedExtras = [];
+    let totalPrice = item.price;
+
+    function updatePrice() {
+        const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
+        totalPrice = (item.price + extrasTotal) * quantity;
+        modal.querySelector('.modal-price').textContent = `${totalPrice} грн`;
+    }
+
+    // Handle quantity controls
+    const quantityDisplay = modal.querySelector('.quantity');
+    
+    modal.querySelector('.minus').addEventListener('click', () => {
+        if (quantity > 1) {
+            quantity--;
+            quantityDisplay.textContent = quantity;
+            updatePrice();
         }
     });
 
-    const applyFiltersBtn = filterModal.querySelector("#apply-filters");
-    applyFiltersBtn.addEventListener("click", () => {
-        const selectedCategories = Array.from(filterModal.querySelectorAll(".filter-checkbox:checked"))
-            .map(checkbox => checkbox.value);
-        const priceMin = parseInt(filterModal.querySelector("#price-min").value) || 0;
-        const priceMax = parseInt(filterModal.querySelector("#price-max").value) || Infinity;
-        const ratingMin = parseInt(filterModal.querySelector("#rating-min").value) || 0;
-
-        filteredSpecialOffers = specialOffers.filter(item => {
-            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
-            const matchesPrice = item.price >= priceMin && item.price <= priceMax;
-            const rating = parseInt(item.rating.match(/\d+/)[0]);
-            const matchesRating = rating >= ratingMin;
-            return matchesCategory && matchesPrice && matchesRating;
-        });
-
-        filteredFullMenu = fullMenu.filter(item => {
-            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
-            const matchesPrice = item.price >= priceMin && item.price <= priceMax;
-            const rating = parseInt(item.rating.match(/\d+/)[0]);
-            const matchesRating = rating >= ratingMin;
-            return matchesCategory && matchesPrice && matchesRating;
-        });
-
-        filteredSpecialOffers = applySort(filteredSpecialOffers);
-        filteredFullMenu = applySort(filteredFullMenu);
-        renderMenuItems(filteredSpecialOffers, specialOffersContainer);
-        renderMenuItems(filteredFullMenu, fullMenuContainer);
-        filterModal.classList.add("fade-out");
-        setTimeout(() => filterModal.remove(), 300);
+    modal.querySelector('.plus').addEventListener('click', () => {
+        quantity++;
+        quantityDisplay.textContent = quantity;
+        updatePrice();
     });
 
-    const resetFiltersBtn = filterModal.querySelector("#reset-filters");
-    resetFiltersBtn.addEventListener("click", () => {
-        filterModal.querySelectorAll(".filter-checkbox").forEach(checkbox => checkbox.checked = false);
-        filterModal.querySelector("#price-min").value = 0;
-        filterModal.querySelector("#price-max").value = 1000;
-        filterModal.querySelector("#rating-min").value = 80;
-        filteredSpecialOffers = [...specialOffers];
-        filteredFullMenu = [...fullMenu];
-        filteredSpecialOffers = applySort(filteredSpecialOffers);
-        filteredFullMenu = applySort(filteredFullMenu);
-        renderMenuItems(filteredSpecialOffers, specialOffersContainer);
-        renderMenuItems(filteredFullMenu, fullMenuContainer);
+    // Handle extras
+    modal.querySelectorAll('.add-extra').forEach(button => {
+        button.addEventListener('click', () => {
+            const name = button.dataset.name;
+            const price = Number(button.dataset.price);
+            
+            if (button.textContent === '+') {
+                button.textContent = '✓';
+                button.style.background = '#FE9A9B';
+                button.style.color = 'white';
+                selectedExtras.push({ name, price });
+            } else {
+                button.textContent = '+';
+                button.style.background = 'white';
+                button.style.color = '#FE9A9B';
+                selectedExtras = selectedExtras.filter(extra => extra.name !== name);
+            }
+            
+            updatePrice();
+        });
     });
 
-    filterModal.classList.add("fade-in");
-});
-
-function openModal(item) {
-    const modal = document.createElement("div");
-    modal.classList.add("modal");
-    modal.innerHTML = `
-        <div class="modal-content">
-            <span class="close-modal">×</span>
-            <div class="modal-inner">
-                <div class="modal-image">
-                    <img src="${item.image}" alt="${item.name}">
-                </div>
-                <div class="modal-info">
-                    <h2>${item.name}</h2>
-                    <p class="modal-price">${item.price} грн</p>
-                    <h3>Додаткові опції</h3>
-                    <ul class="modal-extras">
-                        ${item.extras.map(extra => `
-                            <li data-price="${extra.price}">
-                                <span>${extra.name}</span>
-                                <span>${extra.price} грн</span>
-                                <button class="add-extra">+</button>
-                            </li>
-                        `).join('')}
-                    </ul>
-                    <div class="modal-notes">
-                        <h3>Спеціальні інструкції</h3>
-                        <input type="text" placeholder="Додайте примітку" class="note-input">
-                    </div>
-                    <p class="extra-charge">За додаткові опції може стягуватися плата.</p>
-                    <div class="modal-actions">
-                        <button class="quantity-btn">-</button>
-                        <span class="quantity">1</span>
-                        <button class="quantity-btn">+</button>
-                        <button class="add-to-order">Додати до замовлення - <span class="total-price">${item.price}</span> грн</button>
-                    </div>
-                    <button class="see-details">Дивитися деталі</button>
-                </div>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-
-    const closeButton = modal.querySelector(".close-modal");
-    closeButton.addEventListener("click", () => {
-        modal.classList.add("fade-out");
+    // Handle close
+    const closeButton = modal.querySelector('.close-modal');
+    closeButton.addEventListener('click', () => {
+        modal.classList.remove('show');
         setTimeout(() => modal.remove(), 300);
     });
 
-    modal.addEventListener("click", (e) => {
+    // Handle click outside
+    modal.addEventListener('click', (e) => {
         if (e.target === modal) {
-            modal.classList.add("fade-out");
+            modal.classList.remove('show');
             setTimeout(() => modal.remove(), 300);
         }
     });
 
-    const addExtraButtons = modal.querySelectorAll(".add-extra");
-    let selectedExtras = [];
-    addExtraButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            const li = button.parentElement;
-            li.classList.toggle("selected");
-            const price = parseInt(li.getAttribute("data-price"));
-            if (li.classList.contains("selected")) {
-                selectedExtras.push(price);
-            } else {
-                selectedExtras = selectedExtras.filter(p => p !== price);
-            }
-            updateTotalPrice();
-        });
+    // Handle add to cart
+    modal.querySelector('.add-to-cart-btn').addEventListener('click', () => {
+        const notes = modal.querySelector('textarea').value;
+        cartService.addItem(
+            { ...item, notes }, 
+            selectedExtras,
+            quantity
+        );
+        modal.classList.remove('show');
+        setTimeout(() => modal.remove(), 300);
     });
-
-    const quantityButtons = modal.querySelectorAll(".quantity-btn");
-    let quantity = 1;
-    quantityButtons.forEach(button => {
-        button.addEventListener("click", () => {
-            if (button.textContent === "+" && quantity < 10) {
-                quantity++;
-                button.classList.add("scale-up");
-                setTimeout(() => button.classList.remove("scale-up"), 200);
-            }
-            if (button.textContent === "-" && quantity > 1) {
-                quantity--;
-                button.classList.add("scale-up");
-                setTimeout(() => button.classList.remove("scale-up"), 200);
-            }
-            modal.querySelector(".quantity").textContent = quantity;
-            updateTotalPrice();
-        });
-    });
-
-    function updateTotalPrice() {
-        const basePrice = item.price * quantity;
-        const extraTotal = selectedExtras.reduce((sum, price) => sum + price, 0);
-        const totalPrice = basePrice + extraTotal;
-        modal.querySelector(".total-price").textContent = totalPrice;
-    }
-
-    modal.classList.add("fade-in");
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -463,28 +536,4 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'index.html';
         });
     }
-
-    const cartIcon = document.querySelector('.cart-icon');
-    if (cartIcon) {
-        cartIcon.addEventListener('click', () => {
-            window.location.href = 'order.html'; 
-        });
-    }
-
-    const deliveryBtn = document.querySelector(".delivery");
-    const pickupBtn = document.querySelector(".pickup");
-
-    deliveryBtn.addEventListener("click", () => {
-        deliveryBtn.classList.add("active");
-        deliveryBtn.classList.remove("inactive");
-        pickupBtn.classList.remove("active");
-        pickupBtn.classList.add("inactive");
-    });
-
-    pickupBtn.addEventListener("click", () => {
-        pickupBtn.classList.add("active");
-        pickupBtn.classList.remove("inactive");
-        deliveryBtn.classList.remove("active");
-        deliveryBtn.classList.add("inactive");
-    });
 });

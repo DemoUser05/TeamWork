@@ -1,112 +1,250 @@
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f3e4e5;
+  font-family: 'Roboto', sans-serif;
+  background-color: #f9ecec;
+  color: #333;
 }
 
 .bg-pink {
-  background-color: #f3aab2;
+  background: linear-gradient(to right, #FE9A9B, #ff8182);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-.bg-purple {
-  background-color: #5e5b8c;
+.bg-pink .btn-light {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.bg-pink .btn-light:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.bg-pink .bi-arrow-left {
+  margin-right: 8px;
 }
 
 .card-custom {
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 16px;
+  padding: 24px;
   margin-bottom: 20px;
-  background-color: #7562a6; /* Приклад фіолетового, змінити під дизайн */
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  background: white;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+  border: 1px solid rgba(254, 154, 155, 0.1);
+  transition: all 0.3s ease;
+}
+
+.card-custom:hover {
+  box-shadow: 0 12px 30px rgba(254, 154, 155, 0.12);
+  border-color: rgba(254, 154, 155, 0.2);
 }
 
 .toggle-switch {
+  background: transparent;
+  padding: 3px;
+  border-radius: 30px;
   display: flex;
   gap: 4px;
+  border: 1px solid rgba(254, 154, 155, 0.2);
 }
 
-.badge {
+.toggle-switch .btn {
+  padding: 8px 20px;
+  border-radius: 28px;
+  font-size: 14px;
   font-weight: 500;
-  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  min-width: 100px;
+  text-align: center;
 }
 
+.toggle-switch .btn-dark {
+  background: white;
+  color: #FE9A9B;
+  border: none;
+}
+
+.toggle-switch .btn-light {
+  background: transparent;
+  color: #666;
+  border: none;
+}
+
+.toggle-switch .btn-light:hover {
+  background: rgba(254, 154, 155, 0.1);
+}
 
 input, textarea, .form-control {
-  background-color: #e6e4f7;
-  border: none;
-  border-radius: 10px;
+  background-color: #fff;
+  border: 1px solid rgba(254, 154, 155, 0.2);
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.3s ease;
 }
 
-.btn-light {
-  background-color: #dedbfc;
+input:focus, textarea:focus, .form-control:focus {
+  border-color: #FE9A9B;
+  box-shadow: 0 0 0 3px rgba(254, 154, 155, 0.1);
+  outline: none;
 }
 
-.btn-dark {
-  background-color: #5e5b8c;
-  color: white;
+.input-group-text {
+  background: rgba(254, 154, 155, 0.1);
+  border: 1px solid rgba(254, 154, 155, 0.2);
+  color: #FE9A9B;
+  border-radius: 12px;
+}
+
+.btn-outline-light {
+  border-color: rgba(254, 154, 155, 0.3);
+  color: #666;
+}
+
+.btn-outline-light:hover {
+  background: rgba(254, 154, 155, 0.1);
+  color: #FE9A9B;
+  border-color: #FE9A9B;
 }
 
 .btn-success {
-  background-color: #6dcf9e;
+  background: #FE9A9B;
+  border: none;
+  padding: 12px 24px;
+  font-weight: 500;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+  background: #ff8182;
+  transform: translateY(-2px);
+}
+
+.modal-content {
+  border-radius: 16px;
   border: none;
 }
 
-img {
-  height: 60px;
-  width: 60px;
-  object-fit: cover;
-  border-radius: 10px;
+.modal-header {
+  background: linear-gradient(to right, #FE9A9B, #ff8182);
+  color: white;
+  border: none;
+  border-radius: 16px 16px 0 0 !important;
+  padding: 16px 24px;
 }
 
-/* Стилі для модалки */
-.modal-content {
-  border-radius: 0.5rem;
+.modal-body {
+  padding: 24px;
 }
 
-/* Щоб кнопки не сильно розсувалися */
-.input-group > input[type="tel"] {
-  min-width: 0;
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid rgba(254, 154, 155, 0.1);
 }
 
-/* Стилі для кнопок + і - */
-#order-items button.btn-sm {
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border-radius: 50%;
-  font-weight: bold;
-  font-size: 18px;
-  line-height: 1;
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border: 1.5px solid #ccc;
-  background-color: #f8f9fa;
-  color: #333;
-  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-  user-select: none;
+.btn-primary {
+  background: #FE9A9B;
+  border: none;
+  padding: 8px 24px;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
-#order-items button.btn-sm:hover {
-  background-color: #6f42c1; /* фіолетовий відтінок */
-  border-color: #5a34a5;
-  color: #fff;
-  cursor: pointer;
+.btn-primary:hover {
+  background: #ff8182;
+  transform: translateY(-1px);
 }
 
-#order-items button.btn-sm:focus {
-  outline: none;
-  box-shadow: 0 0 5px #6f42c1;
+.payment-methods {
+  background: white;
 }
 
-.payment-methods .form-check-input:checked {
-  background-color: #b89eff;
-  border-color: #b89eff;
-  box-shadow: 0 0 0 0.2rem rgba(184, 158, 255, 0.25);
+.payment-methods .form-check {
+  margin-bottom: 12px;
 }
 
 .payment-methods .form-check-input {
   cursor: pointer;
+  border-color: rgba(254, 154, 155, 0.3);
+}
+
+.payment-methods .form-check-input:checked {
+  background-color: #FE9A9B;
+  border-color: #FE9A9B;
+  box-shadow: 0 0 0 2px rgba(254, 154, 155, 0.2);
+}
+
+.payment-methods .form-check-label {
+  color: #333;
+  cursor: pointer;
+  padding-left: 8px;
+}
+
+#order-items {
+  margin-top: 16px;
+}
+
+#order-items .item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(254, 154, 155, 0.1);
+}
+
+#order-items img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+#order-items .quantity-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#order-items button.btn-sm {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 50%;
+  font-weight: 500;
+  font-size: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid rgba(254, 154, 155, 0.2);
+  background: white;
+  color: #666;
+  transition: all 0.3s ease;
+}
+
+#order-items button.btn-sm:hover {
+  background: rgba(254, 154, 155, 0.1);
+  color: #FE9A9B;
+  border-color: #FE9A9B;
+}
+
+#summary {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#summary li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(254, 154, 155, 0.1);
+}
+
+#summary li:last-child {
+  border-bottom: none;
+  font-weight: 600;
+  font-size: 18px;
+  padding-top: 16px;
 }

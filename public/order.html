@@ -10,166 +10,190 @@
   <!-- Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
 
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="css/orderStyle.css">
 </head>
 <body>
-  <div class="container-fluid bg-pink py-2 text-start px-3">
+  <div class="container-fluid bg-pink py-3 text-start px-4">
     <button class="btn btn-light" onclick="history.back()"><i class="bi bi-arrow-left"></i> Назад</button>
   </div>
 
-  <div class="container mt-3">
-    <div class="row g-3">
-<!-- Ліва колонка -->
-<div class="col-md-6">
-  <div class="card-custom bg-purple text-white mb-3">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">Деталі замовлення</h5>
-      <div class="toggle-switch bg-light rounded-pill px-1 py-1">
-        <button class="btn btn-dark btn-sm rounded-pill px-3 me-1">Доставка</button>
-        <button class="btn btn-light btn-sm rounded-pill px-3">Самовивіз</button>
-      </div>
-    </div>
-
-    <!-- Адреса -->
-    <div class="mb-3">
-      <div class="d-flex justify-content-between align-items-center">
-        <label class="form-label d-flex align-items-center gap-2 mb-0">
-          <i class="bi bi-geo-alt"></i> Адреса
-        </label>
-        <button class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center p-2" style="width: 32px; height: 32px;" onclick="openAddressModal()" aria-label="Редагувати адресу">
-          <i class="bi bi-pencil"></i>
-        </button>
-      </div>
-    </div>
-
-    <!-- Модальне вікно -->
-    <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 rounded-4">
-          <div class="modal-header bg-purple text-white rounded-top">
-            <h5 class="modal-title" id="addressModalLabel">Редагувати адресу</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Закрити"></button>
-          </div>
-          <div class="modal-body">
-            <div class="row g-2">
-              <div class="col-md-6">
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-building"></i></span>
-                  <input type="text" id="city" class="form-control" placeholder="Місто" autocomplete="address-level2">
-                </div>
-              </div>
-              <div class="col-md-6">
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-signpost"></i></span>
-                  <input type="text" id="street" class="form-control" placeholder="Вулиця" autocomplete="address-line1">
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-layers"></i></span>
-                  <input type="text" id="floor" class="form-control" placeholder="Поверх">
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-door-open"></i></span>
-                  <input type="text" id="apartment" class="form-control" placeholder="Квартира">
-                </div>
-              </div>
-              <div class="col-md-4">
-                <div class="input-group">
-                  <span class="input-group-text"><i class="bi bi-box-arrow-in-right"></i></span>
-                  <input type="text" id="entrance" class="form-control" placeholder="Під'їзд">
-                </div>
-              </div>
+  <div class="container mt-4">
+    <div class="row g-4">
+      <!-- Ліва колонка -->
+      <div class="col-md-6">
+        <div class="card-custom">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="mb-0">Деталі замовлення</h5>
+            <div class="toggle-switch">
+              <button class="btn btn-dark active">Доставка</button>
+              <button class="btn btn-light">Самовивіз</button>
             </div>
           </div>
-          <div class="modal-footer bg-light rounded-bottom">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Скасувати</button>
-            <button type="button" class="btn btn-primary px-4" id="saveAddressBtn">Зберегти</button>
+
+          <!-- Адреса -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <label class="form-label d-flex align-items-center gap-2 mb-0">
+                <i class="bi bi-geo-alt"></i> Адреса доставки
+              </label>
+              <button class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center p-2" style="width: 32px; height: 32px;" onclick="openAddressModal()">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </div>
+            <div class="mt-2 text-muted">
+              Оберіть адресу доставки
+            </div>
+          </div>
+
+          <!-- Телефон -->
+          <div class="mb-4">
+            <div class="d-flex justify-content-between align-items-center">
+              <label class="form-label d-flex align-items-center gap-2 mb-0">
+                <i class="bi bi-telephone"></i> Телефон
+              </label>
+              <button class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center p-2" style="width: 32px; height: 32px;" onclick="togglePhoneEdit()">
+                <i class="bi bi-pencil"></i>
+              </button>
+            </div>
+            <div id="phoneInputWrapper" class="mt-2" style="display: none;">
+              <input type="tel" class="form-control" id="phone" placeholder="+380">
+            </div>
+          </div>
+
+          <!-- Коментар для кур'єра -->
+          <div class="mb-4">
+            <label class="form-label d-flex align-items-center gap-2">
+              <i class="bi bi-chat-text"></i> Коментар для кур'єра
+            </label>
+            <textarea class="form-control" rows="3" placeholder="Вкажіть особливості доставки..."></textarea>
+          </div>
+        </div>
+
+        <!-- Спосіб оплати -->
+        <div class="card-custom payment-methods">
+          <h5 class="mb-3">Спосіб оплати</h5>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="pay" id="pay1" checked>
+            <label class="form-check-label" for="pay1">
+              <i class="bi bi-apple me-2"></i>Apple Pay
+            </label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="pay" id="pay2">
+            <label class="form-check-label" for="pay2">
+              <i class="bi bi-credit-card me-2"></i>За реквізитами карти
+            </label>
+          </div>
+          <div class="form-check mb-3">
+            <input class="form-check-input" type="radio" name="pay" id="pay3">
+            <label class="form-check-label" for="pay3">
+              <i class="bi bi-cash me-2"></i>Готівкою кур'єру
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="pay" id="pay4">
+            <label class="form-check-label" for="pay4">
+              <i class="bi bi-credit-card me-2"></i>Карткою кур'єру
+            </label>
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- Коментар -->
-    <div class="mb-3">
-      <label class="form-label d-flex align-items-center gap-2">
-        <i class="bi bi-chat-text"></i> Коментар для кур'єра
-      </label>
-      <textarea class="form-control" rows="3"></textarea>
-    </div>
-
-    <!-- Телефон -->
-    <div class="mb-3 d-flex justify-content-between align-items-center">
-      <label class="form-label d-flex align-items-center gap-2 mb-0">
-        <i class="bi bi-telephone"></i> Телефон
-        <div id="phoneInputWrapper" class="ms-2" style="overflow: hidden; width: 0;">
-          <input type="tel" class="form-control form-control-sm" id="phone" placeholder="Введіть номер" disabled>
-        </div>
-      </label>
-      <button class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center p-2" style="width: 32px; height: 32px;" onclick="togglePhoneEdit()" aria-label="Редагувати телефон">
-        <i class="bi bi-pencil"></i>
-      </button>
-    </div>
-  </div>
-
-  <!-- Спосіб оплати -->
-  <div class="card-custom payment-methods p-3 rounded text-white">
-    <h5 class="mb-3">Спосіб оплати</h5>
-    <div class="form-check mb-2">
-      <input class="form-check-input" type="radio" name="pay" id="pay1" checked>
-      <label class="form-check-label" for="pay1">Apple Pay</label>
-    </div>
-    <div class="form-check mb-2">
-      <input class="form-check-input" type="radio" name="pay" id="pay2">
-      <label class="form-check-label" for="pay2">За реквізитами карти</label>
-    </div>
-    <div class="form-check mb-2">
-      <input class="form-check-input" type="radio" name="pay" id="pay3">
-      <label class="form-check-label" for="pay3">Готівкою кур'єру</label>
-    </div>
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="pay" id="pay4">
-      <label class="form-check-label" for="pay4">Карткою кур'єру</label>
-    </div>
-  </div>
-
-  <div class="card-custom bg-purple text-white mt-3">
-    <h5>Коментар</h5>
-    <textarea class="form-control" rows="3" placeholder="Ваш коментар..."></textarea>
-  </div>
-</div>
-
   
       <!-- Права колонка -->
       <div class="col-md-6">
-        <div class="card-custom bg-purple text-white mb-3">
-          <h5>Ваше замовлення</h5>
-          <div id="order-items"></div>
-          <div class="input-group mt-3">
-            <input type="text" id="promo" class="form-control" placeholder="Промокод">
-            <button class="btn btn-light" onclick="applyPromo()">Активувати</button>
+        <div class="card-custom">
+          <h5 class="mb-3">Ваше замовлення</h5>
+          <div id="order-items">
+            <!-- Order items will be inserted here -->
+          </div>
+          <div class="input-group mt-4">
+            <input type="text" class="form-control" placeholder="Промокод">
+            <button class="btn btn-outline-light">Активувати</button>
           </div>
         </div>
   
-        <div class="card-custom bg-purple text-white">
-          <h5>Сума до сплати</h5>
-          <ul class="list-group mb-3" id="summary"></ul>
-          <button class="btn btn-success w-100">Оплатити</button>
+        <div class="card-custom mt-4">
+          <h5 class="mb-3">Сума до сплати</h5>
+          <ul class="list-group mb-4" id="summary">
+            <li>
+              <span>Вартість страв</span>
+              <span>0 ₴</span>
+            </li>
+            <li>
+              <span>Доставка</span>
+              <span>0 ₴</span>
+            </li>
+            <li>
+              <span>Всього до сплати</span>
+              <span>0 ₴</span>
+            </li>
+          </ul>
+          <button class="btn btn-success w-100">Оплатити замовлення</button>
         </div>
       </div>
     </div>
   </div>
-  
+
+  <!-- Модальне вікно адреси -->
+  <div class="modal fade" id="addressModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Адреса доставки</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-building"></i></span>
+                <input type="text" id="city" class="form-control" placeholder="Місто">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-signpost"></i></span>
+                <input type="text" id="street" class="form-control" placeholder="Вулиця">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-layers"></i></span>
+                <input type="text" id="floor" class="form-control" placeholder="Поверх">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-door-open"></i></span>
+                <input type="text" id="apartment" class="form-control" placeholder="Квартира">
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-box-arrow-in-right"></i></span>
+                <input type="text" id="entrance" class="form-control" placeholder="Під'їзд">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Скасувати</button>
+          <button type="button" class="btn btn-primary px-4" id="saveAddressBtn">Зберегти</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- GSAP для анімацій -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 
-  <!-- Bootstrap Bundle JS (включає Popper) -->
+  <!-- Bootstrap Bundle JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Твій скрипт -->
+  <!-- Основний скрипт -->
   <script src="js/orderScript.js"></script>
 </body>
 </html>
