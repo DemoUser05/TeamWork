@@ -666,20 +666,45 @@ function handlePayment() {
       showErrorMessage('Оберіть ресторан');
       return;
     }
+
+    // Перевіряємо час самовивозу
+    const pickupTime = document.getElementById('pickupTime').value;
+    if (!pickupTime) {
+      showErrorMessage('Оберіть час самовивозу');
+      return;
+    }
+
+    // Перевіряємо чи вибраний час не в минулому
+    const [hours, minutes] = pickupTime.split(':').map(Number);
+    const currentTime = new Date();
+    const selectedTime = new Date();
+    selectedTime.setHours(hours, minutes, 0);
+
+    if (selectedTime < currentTime) {
+      showErrorMessage('Час самовивозу не може бути в минулому');
+      return;
+    }
   }
 
-  // Показуємо анімацію успішної оплати
+    // Перевіряємо номер телефону
+    const phoneInput = document.getElementById('phone');
+    if (!phoneInput.value || !validatePhoneNumber(phoneInput.value)) {
+      showErrorMessage('Будь ласка, введіть коректний номер телефону');
+      return;
+    }
+  
+  // Показуємо повідомлення про підтвердження замовлення
   const paymentBtn = document.querySelector('.payment-btn');
   if (paymentBtn) {
-    paymentBtn.innerHTML = '<i class="bi bi-check-lg"></i> Оплачено';
+    paymentBtn.innerHTML = '<i class="bi bi-check-lg"></i> Замовлення прийнято';
     paymentBtn.classList.add('btn-success');
     paymentBtn.disabled = true;
 
     // Очищаємо кошик
     cartService.clearCart();
 
-    // Показуємо повідомлення про успіх
-    showSuccessMessage('Замовлення успішно оплачено');
+    // Показуємо повідомлення про зв'язок з менеджером
+    showSuccessMessage('Дякуємо за замовлення! Наш менеджер зв\'яжеться з вами найближчим часом для підтвердження.');
 
     // Затримка перед перенаправленням
     setTimeout(() => {
@@ -687,11 +712,10 @@ function handlePayment() {
         opacity: 0,
         duration: 0.5,
         onComplete: () => {
-          // Перенаправляємо на головну сторінку
           window.location.href = 'index.html';
         }
       });
-    }, 1500);
+    }, 3000);
   }
 }
 
