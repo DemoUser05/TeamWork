@@ -399,14 +399,16 @@ const banners = [
     subtitle: "Спеціальна пропозиція",
     buttonText: "Замовляйте прямо зараз!",
     bgColor: "#FFE8E8",
-    image: "images/banner3.jpg"
+    image: "images/banner3.jpg",
+    link: "menu.html?id=1"
   },
   {
     title: "Доставка улюблених страв",
     subtitle: "Отримуйте 10% знижку на перше замовлення за промокодом!",
     buttonText: "Дізнатись більше",
     bgColor: "#FFF8DC",
-    image: "images/banner4.jpg"
+    image: "images/banner4.jpg",
+    link: "profile.html#promo"
   }
 ];
 
@@ -434,7 +436,7 @@ function initBannerCarousel() {
       <div class="banner-content">
         <h2>${banner.title}</h2>
         <p>${banner.subtitle}</p>
-        <button class="banner-btn">${banner.buttonText}</button>
+        <button class="banner-btn" ${banner.link ? `data-link="${banner.link}"` : ''}>${banner.buttonText}</button>
       </div>
       <img src="${banner.image}" alt="${banner.title}">
     `;
@@ -466,6 +468,23 @@ function initBannerCarousel() {
       slide.style.display = i === index ? 'flex' : 'none';
     });
   }
+
+  // Додаємо обробник кліків для кнопок банера
+  container.addEventListener('click', (e) => {
+    if (e.target.classList.contains('banner-btn')) {
+      const link = e.target.dataset.link;
+      if (link) {
+        if (link.includes('#promo')) {
+          // Якщо це посилання на промокод, відкриваємо модальне вікно після переходу
+          window.location.href = link;
+          // Зберігаємо флаг в localStorage
+          localStorage.setItem('openPromoModal', 'true');
+        } else {
+          window.location.href = link;
+        }
+      }
+    }
+  });
 
   // Обробники для кнопок
   nextBtn.addEventListener('click', () => {

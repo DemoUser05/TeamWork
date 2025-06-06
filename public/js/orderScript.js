@@ -877,26 +877,36 @@ function showErrorMessage(message) {
   }, 3000);
 }
 
+// Функція для розрахунку загальної суми
 function calculateTotal() {
   let total = 0;
-  let subtotal = 0;
-
-  items.forEach(item => {
-    subtotal += item.price * item.qty;
+  
+  // Сума товарів
+  cartService.cart.forEach(item => {
+    total += item.price * item.quantity;
   });
 
-  total = subtotal;
-  
-  if (discount > 0) {
-    total -= discount;
+  // Знижка по промокоду (якщо є)
+  const promoDiscount = document.querySelector('.promo-discount');
+  if (promoDiscount) {
+    const discountAmount = parseFloat(promoDiscount.textContent);
+    if (!isNaN(discountAmount)) {
+      total -= discountAmount;
+    }
   }
 
+  // Вартість доставки
   const isDelivery = document.getElementById('deliveryBtn').classList.contains('btn-dark');
-  if (isDelivery && subtotal < 500) {
-    total += 60; // Вартість доставки
+  if (isDelivery) {
+    const deliveryFee = 60; // Фіксована вартість доставки
+    if (total < 500) { // Якщо сума менше 500 грн
+      total += deliveryFee;
+    }
   }
 
-  total += 20; // Сервісний збір
+  // Сервісний збір
+  const serviceFee = 20;
+  total += serviceFee;
 
   return total;
 }

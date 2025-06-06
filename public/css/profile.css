@@ -223,7 +223,7 @@ body {
   margin: 20px;
   padding: 16px;
   text-align: center;
-  background: #ff4444;
+  background: #8b0303;
   border: none;
   border-radius: 12px;
   color: white;
@@ -580,23 +580,77 @@ body {
 
 /* Стилі для замовлень */
 .order-item {
-  border-left-color: #2196F3;
+  background: white;
+  border: 1px solid rgba(254, 154, 155, 0.2);
+  transition: all 0.3s ease;
 }
 
-.order-item .order-date {
+.order-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(254, 154, 155, 0.1);
+  border-color: rgba(254, 154, 155, 0.3);
+}
+
+.order-date {
   color: #666;
   font-size: 14px;
 }
 
-.order-item .order-amount {
-  font-weight: bold;
-  color: #2196F3;
+.order-amount {
+  font-weight: 600;
+  color: #FE9A9B;
+  font-size: 16px;
 }
 
-.order-item .order-items {
-  color: #555;
+.order-items {
   font-size: 14px;
-  margin-top: 5px;
+  line-height: 1.4;
+}
+
+.badge.bg-success {
+  background-color: #4CAF50 !important;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 20px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state i {
+  font-size: 48px;
+  color: #FE9A9B;
+  margin-bottom: 16px;
+}
+
+.empty-state p {
+  color: #666;
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.empty-state .btn-primary {
+  background: #FE9A9B;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 12px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.empty-state .btn-primary:hover {
+  background: #ff8182;
+  transform: translateY(-2px);
+}
+
+.order-details {
+  font-size: 13px;
+}
+
+.order-details i {
+  color: #999;
 }
 
 /* Стилі для гаманців */

@@ -96,187 +96,67 @@ document.addEventListener('DOMContentLoaded', function() {
         e.target.value = e.target.value.replace(/\D/g, '').slice(0, 3);
     });
 
-    // Показ сповіщення про успішну оплату
-    function showSuccessNotification() {
-        // Створюємо елемент сповіщення
-        const notification = document.createElement('div');
-        notification.className = 'payment-notification';
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="bi bi-check-circle-fill"></i>
-                <div class="notification-text">
-                    <h4>Оплата пройшла успішно!</h4>
-                    <p>Незабаром кур'єр зв'яжеться з вами</p>
-                </div>
-            </div>
-        `;
-
-        // Додаємо стилі для сповіщення
-        const style = document.createElement('style');
-        style.textContent = `
-            .payment-notification {
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: #fff;
-                border-radius: 12px;
-                padding: 20px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-                z-index: 1000;
-                animation: slideIn 0.5s ease-out;
-                border: 1px solid rgba(254, 154, 155, 0.2);
-            }
-
-            .notification-content {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-            }
-
-            .notification-content i {
-                font-size: 24px;
-                color: #2ecc71;
-            }
-
-            .notification-text {
-                color: #333;
-            }
-
-            .notification-text h4 {
-                margin: 0;
-                font-size: 16px;
-                font-weight: 600;
-            }
-
-            .notification-text p {
-                margin: 5px 0 0;
-                font-size: 14px;
-                color: #666;
-            }
-
-            @keyframes slideIn {
-                from {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-                to {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-            }
-
-            @keyframes slideOut {
-                from {
-                    transform: translateX(0);
-                    opacity: 1;
-                }
-                to {
-                    transform: translateX(100%);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
-        document.body.appendChild(notification);
-
-        // Видаляємо сповіщення після затримки
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.5s ease-out';
-            setTimeout(() => {
-                notification.remove();
-                style.remove();
-                // Перенаправляємо на сторінку успіху
-                window.location.href = 'index.html';
-            }, 500);
-        }, 2000);
-    }
-
-    // Валідація форми
+    // Обробник форми оплати
     const paymentForm = document.getElementById('payment-form');
-    paymentForm.addEventListener('submit', async function(e) {
+    paymentForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        
-        // Очищення попередніх помилок
-        clearValidationErrors();
 
-        // Валідація полів
-        let isValid = true;
-        
-        // Перевірка номера карти
-        const cardNumberValue = cardNumber.value.replace(/\s/g, '');
-        if (!/^\d{16}$/.test(cardNumberValue)) {
-            showError(cardNumber, 'Введіть правильний номер карти');
-            isValid = false;
-        }
+        const submitButton = this.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.innerHTML = `
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Обробка оплати...
+        `;
 
-        // Перевірка терміну дії
-        const [month, year] = expiry.value.split('/');
-        const now = new Date();
-        const currentYear = now.getFullYear() % 100;
-        const currentMonth = now.getMonth() + 1;
+        // Імітуємо обробку платежу
+        setTimeout(() => {
+            // Очищаємо кошик
+            localStorage.removeItem('cart');
+            localStorage.removeItem('orderData');
 
-        if (!month || !year || 
-            !/^\d{2}$/.test(month) || !/^\d{2}$/.test(year) ||
-            parseInt(month) < 1 || parseInt(month) > 12 ||
-            (parseInt(year) < currentYear || 
-             (parseInt(year) === currentYear && parseInt(month) < currentMonth))) {
-            showError(expiry, 'Введіть правильний термін дії');
-            isValid = false;
-        }
+            // Показуємо повідомлення про успіх
+            const successMessage = document.createElement('div');
+            successMessage.className = 'alert alert-success text-center';
+            successMessage.style.position = 'fixed';
+            successMessage.style.top = '20px';
+            successMessage.style.left = '50%';
+            successMessage.style.transform = 'translateX(-50%)';
+            successMessage.style.padding = '20px 40px';
+            successMessage.style.borderRadius = '10px';
+            successMessage.style.backgroundColor = '#FE9A9B';
+            successMessage.style.color = 'white';
+            successMessage.style.zIndex = '1000';
+            successMessage.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+            successMessage.style.minWidth = '300px';
+            successMessage.style.animation = 'slideDown 0.5s ease-out';
+            successMessage.innerHTML = `
+                <h4 class="mb-3">Оплата пройшла успішно!</h4>
+                <p class="mb-0">Незабаром з вами зв'яжеться кур'єр</p>
+            `;
 
-        // Перевірка CVV
-        if (!/^\d{3}$/.test(cvv.value)) {
-            showError(cvv, 'Введіть правильний CVV код');
-            isValid = false;
-        }
-
-        // Перевірка імені
-        const cardName = document.getElementById('card-name');
-        if (!/^[A-ZА-ЯІЇЄ\s]{2,}$/.test(cardName.value.toUpperCase())) {
-            showError(cardName, 'Введіть ім\'я, як вказано на карті');
-            isValid = false;
-        }
-
-        if (isValid) {
-            // Показуємо анімацію завантаження
-            const submitBtn = paymentForm.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            paymentForm.classList.add('loading');
-
-            try {
-                // Імітуємо обробку платежу
-                await processPayment();
-                
-                // Показуємо сповіщення про успішну оплату
-                showSuccessNotification();
-                
-                // Очищаємо кошик
-                localStorage.removeItem('cart');
-            } catch (error) {
-                showError(submitBtn, 'Помилка оплати. Спробуйте ще раз.');
-                submitBtn.disabled = false;
-                paymentForm.classList.remove('loading');
-            }
-        }
+            // Додаємо стилі анімації
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    from {
+                        transform: translate(-50%, -100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translate(-50%, 0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            document.body.appendChild(successMessage);
+            
+            // Перенаправляємо на головну сторінку
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 3000);
+        }, 2000);
     });
-
-    // Функція для відображення помилок
-    function showError(element, message) {
-        element.classList.add('is-invalid');
-        const feedback = document.createElement('div');
-        feedback.className = 'invalid-feedback';
-        feedback.textContent = message;
-        element.parentNode.appendChild(feedback);
-    }
-
-    // Функція для очищення помилок
-    function clearValidationErrors() {
-        const invalidInputs = paymentForm.querySelectorAll('.is-invalid');
-        const errorMessages = paymentForm.querySelectorAll('.invalid-feedback');
-        
-        invalidInputs.forEach(input => input.classList.remove('is-invalid'));
-        errorMessages.forEach(msg => msg.remove());
-    }
 
     // Імітація обробки платежу
     function processPayment() {

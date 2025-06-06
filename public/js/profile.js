@@ -5,7 +5,7 @@ import {
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  doc, getDoc, updateDoc, collection, getDocs, query, where, addDoc, deleteDoc, setDoc
+  doc, getDoc, updateDoc, collection, getDocs, query, where, addDoc, deleteDoc, setDoc, orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = window.auth;
@@ -81,7 +81,64 @@ const SUBSCRIPTION_DURATIONS = [
   { months: 12, name: '12 місяців', multiplier: 10 }
 ];
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async function() {
+  // Перевіряємо чи потрібно відкрити модальне вікно промокоду
+  if (localStorage.getItem('openPromoModal') === 'true' || window.location.hash === '#promo') {
+    // Відкриваємо модальне вікно промокоду
+    const promoCodeModal = document.getElementById('promoCodeModal');
+    if (promoCodeModal) {
+      promoCodeModal.style.display = 'block';
+      // Очищаємо флаг
+      localStorage.removeItem('openPromoModal');
+    }
+  }
+
+  // Ініціалізація кнопок модальних вікон
+  const promoCodeBtn = document.getElementById('promoCodeBtn');
+  const promoCodeModal = document.getElementById('promoCodeModal');
+  const closePromoModal = document.getElementById('closePromoModal');
+
+  if (promoCodeBtn && promoCodeModal) {
+    promoCodeBtn.addEventListener('click', () => {
+      promoCodeModal.style.display = 'block';
+    });
+  }
+
+  if (closePromoModal && promoCodeModal) {
+    closePromoModal.addEventListener('click', () => {
+      promoCodeModal.style.display = 'none';
+    });
+  }
+
+  // Закриття модального вікна при кліку поза ним
+  window.addEventListener('click', (event) => {
+    if (event.target === promoCodeModal) {
+      promoCodeModal.style.display = 'none';
+    }
+  });
+
+  // Копіювання промокоду
+  const copyPromoBtn = document.getElementById('copyPromoBtn');
+  const promoCodeDisplay = document.getElementById('promoCodeDisplay');
+
+  if (copyPromoBtn && promoCodeDisplay) {
+    // Встановлюємо промокод
+    promoCodeDisplay.textContent = 'FIRST10';
+
+    copyPromoBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText(promoCodeDisplay.textContent)
+        .then(() => {
+          copyPromoBtn.innerHTML = '<i class="fas fa-check"></i> Скопійовано';
+          setTimeout(() => {
+            copyPromoBtn.innerHTML = '<i class="fas fa-copy"></i> Скопіювати код';
+          }, 2000);
+        })
+        .catch(err => {
+          console.error('Помилка при копіюванні:', err);
+        });
+    });
+  }
+
   setupEventListeners();
   checkAuthState();
   initializeSubscriptions();
