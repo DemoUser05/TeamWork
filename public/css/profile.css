@@ -223,7 +223,7 @@ body {
   margin: 20px;
   padding: 16px;
   text-align: center;
-  background: #8b0303;
+  background: #ff4444;
   border: none;
   border-radius: 12px;
   color: white;
@@ -580,77 +580,40 @@ body {
 
 /* Стилі для замовлень */
 .order-item {
-  background: white;
-  border: 1px solid rgba(254, 154, 155, 0.2);
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 10px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   transition: all 0.3s ease;
 }
 
 .order-item:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(254, 154, 155, 0.1);
-  border-color: rgba(254, 154, 155, 0.3);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-.order-date {
-  color: #666;
-  font-size: 14px;
+.order-info {
+  width: 100%;
 }
 
-.order-amount {
-  font-weight: 600;
-  color: #FE9A9B;
+.order-info strong {
   font-size: 16px;
+  color: #333;
+  display: block;
+  text-align: left;
 }
 
-.order-items {
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-.badge.bg-success {
-  background-color: #4CAF50 !important;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 20px;
-}
-
-.empty-state {
+.no-data {
   text-align: center;
-  padding: 40px 20px;
-}
-
-.empty-state i {
-  font-size: 48px;
-  color: #FE9A9B;
-  margin-bottom: 16px;
-}
-
-.empty-state p {
+  padding: 20px;
   color: #666;
-  margin-bottom: 20px;
-  font-size: 16px;
-}
-
-.empty-state .btn-primary {
-  background: #FE9A9B;
-  border: none;
-  padding: 10px 24px;
+  font-style: italic;
+  background: #f9f9f9;
   border-radius: 12px;
-  font-weight: 500;
-  transition: all 0.3s ease;
-}
-
-.empty-state .btn-primary:hover {
-  background: #ff8182;
-  transform: translateY(-2px);
-}
-
-.order-details {
-  font-size: 13px;
-}
-
-.order-details i {
-  color: #999;
+  margin: 10px 0;
 }
 
 /* Стилі для гаманців */
@@ -680,6 +643,25 @@ body {
   color: #E91E63;
   margin-right: 10px;
   font-size: 18px;
+}
+
+.favorite-info {
+  flex: 1;
+}
+
+.remove-favorite {
+  background: none;
+  border: none;
+  color: #ff4444;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.remove-favorite:hover {
+  background: rgba(255, 68, 68, 0.1);
+  transform: scale(1.1);
 }
 
 /* Стилі для промо коду */

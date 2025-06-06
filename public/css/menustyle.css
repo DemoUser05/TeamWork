@@ -416,6 +416,35 @@ body {
     color: #000;
 }
 
+.favorite-btn {
+    position: absolute;
+    top: 20px;
+    right: 60px;
+    background: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    font-size: 20px;
+    color: #FE9A9B;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(254, 154, 155, 0.2);
+}
+
+.favorite-btn.active {
+    background: #FE9A9B;
+    color: white;
+}
+
 .modal-info h3 {
     font-size: 16px;
     font-weight: 500;
@@ -522,18 +551,23 @@ body {
 }
 
 .add-to-cart-btn {
-    flex-grow: 1;
-    padding: 12px 24px;
-    background: #000;
+    width: 100%;
+    padding: 16px;
+    background: #FE9A9B;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 12px;
     font-size: 16px;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease;
-    margin-left: 12px;
-    white-space: nowrap;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.add-to-cart-btn:hover {
+    background: #ff8182;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(254, 154, 155, 0.2);
 }
 
 .add-to-order {

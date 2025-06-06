@@ -162,54 +162,53 @@ function createModals() {
 // Set up event listeners
 function setupEventListeners() {
   // Navigation buttons
-  elements.backBtn.addEventListener('click', () => window.history.back());
-  elements.cartBtn.addEventListener('click', () => window.location.href = "images/cart.png");
-  elements.profileBtn.addEventListener('click', () => {});
+  elements.backBtn?.addEventListener('click', () => window.history.back());
+  elements.cartBtn?.addEventListener('click', () => window.location.href = "cart.html");
 
   // Profile editing
-  elements.editProfileBtn.addEventListener('click', () => showModal(elements.editProfileModal));
-  elements.closeEditModal.addEventListener('click', () => hideModal(elements.editProfileModal));
-  elements.profileForm.addEventListener('submit', handleProfileUpdate);
+  elements.editProfileBtn?.addEventListener('click', () => showModal(elements.editProfileModal));
+  elements.closeEditModal?.addEventListener('click', () => hideModal(elements.editProfileModal));
+  elements.profileForm?.addEventListener('submit', handleProfileUpdate);
 
   // Menu items
-  elements.subscriptionsBtn.addEventListener('click', async () => {
+  elements.subscriptionsBtn?.addEventListener('click', async () => {
     await loadSubscriptions();
     showModal(elements.subscriptionsModal);
   });
   
-  elements.ordersBtn.addEventListener('click', async () => {
+  elements.ordersBtn?.addEventListener('click', async () => {
     await loadOrders();
     showModal(elements.ordersModal);
   });
   
-  elements.walletsBtn.addEventListener('click', async () => {
+  elements.walletsBtn?.addEventListener('click', async () => {
     await loadWallets();
     showModal(elements.walletsModal);
   });
   
-  elements.favoritesBtn.addEventListener('click', async () => {
-    await loadFavorites();
+  elements.favoritesBtn?.addEventListener('click', () => {
+    renderFavorites();
     showModal(elements.favoritesModal);
   });
   
-  elements.promoCodeBtn.addEventListener('click', () => {
+  elements.promoCodeBtn?.addEventListener('click', () => {
     generatePromoCode();
     showModal(elements.promoCodeModal);
   });
 
   // Wallet management
-  elements.addWalletBtn.addEventListener('click', () => showModal(elements.addWalletModal));
-  elements.closeAddWalletModal.addEventListener('click', () => hideModal(elements.addWalletModal));
-  elements.walletForm.addEventListener('submit', handleAddWallet);
-  elements.closeWalletsModal.addEventListener('click', () => hideModal(elements.walletsModal));
+  elements.addWalletBtn?.addEventListener('click', () => showModal(elements.addWalletModal));
+  elements.closeAddWalletModal?.addEventListener('click', () => hideModal(elements.addWalletModal));
+  elements.walletForm?.addEventListener('submit', handleAddWallet);
+  elements.closeWalletsModal?.addEventListener('click', () => hideModal(elements.walletsModal));
 
   // Close buttons
-  elements.closeSubscriptionsModal.addEventListener('click', () => hideModal(elements.subscriptionsModal));
-  elements.closeOrdersModal.addEventListener('click', () => hideModal(elements.ordersModal));
-  elements.closeFavoritesModal.addEventListener('click', () => hideModal(elements.favoritesModal));
-  elements.closePromoModal.addEventListener('click', () => hideModal(elements.promoCodeModal));
+  elements.closeSubscriptionsModal?.addEventListener('click', () => hideModal(elements.subscriptionsModal));
+  elements.closeOrdersModal?.addEventListener('click', () => hideModal(elements.ordersModal));
+  elements.closeFavoritesModal?.addEventListener('click', () => hideModal(elements.favoritesModal));
+  elements.closePromoModal?.addEventListener('click', () => hideModal(elements.promoCodeModal));
   
-  elements.copyPromoBtn.addEventListener('click', copyPromoCode);
+  elements.copyPromoBtn?.addEventListener('click', copyPromoCode);
 
   // Close modals when clicking outside
   window.addEventListener('click', (e) => {
@@ -462,18 +461,31 @@ function renderOrders(orders) {
     `).join('');
   } else {
     // Якщо замовлень немає, показуємо історію з localStorage
-    const orderNames = JSON.parse(localStorage.getItem('profileOrderNames')) || [];
-    if (orderNames.length > 0) {
-      elements.ordersList.innerHTML = `
-        <div class="modal-list-item order-item">
-          <strong>Історія замовлень (збережено локально)</strong>
-          <div class="order-items">${orderNames.map(name => `<div>${name}</div>`).join('')}</div>
-        </div>
-      `;
-    } else {
-      elements.ordersList.innerHTML = '<div class="no-data">У вас немає історії замовлень</div>';
-    }
+    renderOrderHistory();
   }
+}
+
+function renderOrderHistory() {
+  const orderNames = JSON.parse(localStorage.getItem('profileOrderNames')) || [];
+  const ordersList = document.getElementById('ordersList');
+  
+  if (!ordersList) {
+    console.error('Orders list container not found');
+    return;
+  }
+
+  if (orderNames.length === 0) {
+    ordersList.innerHTML = '<div class="no-data">У вас немає замовлень</div>';
+    return;
+  }
+
+  ordersList.innerHTML = orderNames.map(name => `
+    <div class="modal-list-item order-item">
+      <div class="order-info">
+        <strong>${name}</strong>
+      </div>
+    </div>
+  `).join('');
 }
 
 function renderWallets(wallets) {
@@ -507,29 +519,41 @@ function renderWallets(wallets) {
   });
 }
 
-function renderFavorites(favorites) {
-  elements.favoritesList.innerHTML = favorites.length > 0
-    ? favorites.map(fav => `
-        <div class="modal-list-item favorite-item" style="display: flex; justify-content: space-between; align-items: center;">
-          <div class="favorite-info">
-            <strong>${fav.dishName || 'Улюблена страва'}</strong>
-            <span>${fav.dishCategory ? `(${fav.dishCategory})` : ''}</span>
-          </div>
-          <button class="remove-favorite" data-id="${fav.id}" style="background: none; border: none; color: #ff4444; cursor: pointer;">
-            <i class="fas fa-times"></i> Видалити
-          </button>
-        </div>
-      `).join('')
-    : '<div class="no-data">У вас немає улюблених страв</div>';
+// Функція для відображення улюблених страв
+function renderFavorites() {
+  const favorites = JSON.parse(localStorage.getItem('profileFavorites')) || [];
+  const favoritesList = document.getElementById('favoritesList');
   
-  // Додаємо обробники подій для кнопок видалення
-  document.querySelectorAll('.remove-favorite').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const favoriteId = e.currentTarget.getAttribute('data-id');
-      await deleteFavorite(favoriteId);
-    });
-  });
+  if (!favoritesList) {
+    console.error('Favorites list container not found');
+    return;
+  }
+
+  if (favorites.length === 0) {
+    favoritesList.innerHTML = '<div class="no-data">У вас немає улюблених страв</div>';
+    return;
+  }
+
+  favoritesList.innerHTML = favorites.map(dish => `
+    <div class="modal-list-item favorite-item">
+      <div class="favorite-info">
+        <strong>${dish}</strong>
+      </div>
+      <button class="remove-favorite" onclick="removeFavorite('${dish}')">
+        <i class="fas fa-times"></i> Видалити
+      </button>
+    </div>
+  `).join('');
 }
+
+// Функція для видалення з улюблених
+window.removeFavorite = function(dishName) {
+  let favorites = JSON.parse(localStorage.getItem('profileFavorites')) || [];
+  favorites = favorites.filter(dish => dish !== dishName);
+  localStorage.setItem('profileFavorites', JSON.stringify(favorites));
+  renderFavorites();
+  showToast('Страву видалено з улюблених');
+};
 
 // Helper functions
 function getOrderItems(items) {
@@ -581,13 +605,15 @@ function copyPromoCode() {
 }
 
 function showModal(modal) {
-  modal.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
+  if (modal) {
+    modal.style.display = 'flex';
+  }
 }
 
 function hideModal(modal) {
-  modal.style.display = 'none';
-  document.body.style.overflow = 'auto';
+  if (modal) {
+    modal.style.display = 'none';
+  }
 }
 
 function hideAllModals() {

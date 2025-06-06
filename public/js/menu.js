@@ -393,7 +393,11 @@ function createMenuItem(item) {
     div.setAttribute("data-category", item.category);
     div.innerHTML = `
         <div class="menu-details">
-            <h3>${item.name}</h3>
+            <h3>${item.name}
+                <button class="add-to-favorites-btn" data-name="${item.name}" title="Додати в улюблені" style="background:none;border:none;cursor:pointer;margin-left:8px;vertical-align:middle;">
+                    <i class="fas fa-heart"></i>
+                </button>
+            </h3>
             <div class="price-rating">
                 <p class="price">${item.price} грн</p>
                 <p class="rating">${item.rating}</p>
@@ -405,6 +409,18 @@ function createMenuItem(item) {
             <div class="add-to-cart">+</div>
         </div>
     `;
+    // Додаємо обробник для кнопки улюбленого
+    setTimeout(() => {
+        const favBtn = div.querySelector('.add-to-favorites-btn');
+        if (favBtn) {
+            favBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const name = this.getAttribute('data-name');
+                if (window.addFavoriteDish) window.addFavoriteDish(name);
+                this.style.color = 'red';
+            });
+        }
+    }, 0);
     return div;
 }
 
@@ -452,6 +468,7 @@ function openModal(item) {
         <div class="menu-modal-content">
             <div class="menu-modal-header">
                 <h3>${item.name}</h3>
+                <button class="favorite-btn">♥</button>
                 <button class="close-modal">&times;</button>
             </div>
             <div class="menu-modal-body">
@@ -480,18 +497,19 @@ function openModal(item) {
                             </div>
                         </div>
                     ` : ''}
-
+                    
                     <div class="special-instructions">
                         <h4>Спеціальні інструкції</h4>
-                        <textarea placeholder="Додайте примітку"></textarea>
+                        <textarea placeholder="Додайте примітку до замовлення"></textarea>
                     </div>
-
+                    
                     <div class="quantity-control">
                         <button class="quantity-btn minus">-</button>
                         <span class="quantity">1</span>
                         <button class="quantity-btn plus">+</button>
-                        <button class="add-to-cart-btn">Додати до замовлення</button>
                     </div>
+                    
+                    <button class="add-to-cart-btn">Додати до замовлення</button>
                 </div>
             </div>
         </div>
@@ -504,50 +522,59 @@ function openModal(item) {
     let selectedExtras = [];
     let totalPrice = item.price;
 
+    // Get favorite status
+    const favorites = JSON.parse(localStorage.getItem('profileFavorites')) || [];
+    const isFavorite = favorites.includes(item.name);
+    const favoriteBtn = modal.querySelector('.favorite-btn');
+    
+    if (isFavorite) {
+        favoriteBtn.classList.add('active');
+    }
+
+    // Handle favorite button
+    favoriteBtn.addEventListener('click', () => {
+        const favorites = JSON.parse(localStorage.getItem('profileFavorites')) || [];
+        const index = favorites.indexOf(item.name);
+        
+        if (index === -1) {
+            // Add to favorites
+            favorites.push(item.name);
+            favoriteBtn.classList.add('active');
+            showNotification('Додано до улюблених');
+        } else {
+            // Remove from favorites
+            favorites.splice(index, 1);
+            favoriteBtn.classList.remove('active');
+            showNotification('Видалено з улюблених');
+        }
+        
+        localStorage.setItem('profileFavorites', JSON.stringify(favorites));
+    });
+
+    // Handle quantity buttons
+    const minusBtn = modal.querySelector('.quantity-btn.minus');
+    const plusBtn = modal.querySelector('.quantity-btn.plus');
+    const quantitySpan = modal.querySelector('.quantity');
+
+    minusBtn.addEventListener('click', () => {
+        if (quantity > 1) {
+            quantity--;
+            quantitySpan.textContent = quantity;
+            updatePrice();
+        }
+    });
+
+    plusBtn.addEventListener('click', () => {
+        quantity++;
+        quantitySpan.textContent = quantity;
+        updatePrice();
+    });
+
     function updatePrice() {
         const extrasTotal = selectedExtras.reduce((sum, extra) => sum + extra.price, 0);
         totalPrice = (item.price + extrasTotal) * quantity;
         modal.querySelector('.modal-price').textContent = `${totalPrice} грн`;
     }
-
-    // Handle quantity controls
-    const quantityDisplay = modal.querySelector('.quantity');
-    
-    modal.querySelector('.minus').addEventListener('click', () => {
-        if (quantity > 1) {
-            quantity--;
-            quantityDisplay.textContent = quantity;
-            updatePrice();
-        }
-    });
-
-    modal.querySelector('.plus').addEventListener('click', () => {
-        quantity++;
-        quantityDisplay.textContent = quantity;
-        updatePrice();
-    });
-
-    // Handle extras
-    modal.querySelectorAll('.add-extra').forEach(button => {
-        button.addEventListener('click', () => {
-            const name = button.dataset.name;
-            const price = Number(button.dataset.price);
-            
-            if (button.textContent === '+') {
-                button.textContent = '✓';
-                button.style.background = '#FE9A9B';
-                button.style.color = 'white';
-                selectedExtras.push({ name, price });
-            } else {
-                button.textContent = '+';
-                button.style.background = 'white';
-                button.style.color = '#FE9A9B';
-                selectedExtras = selectedExtras.filter(extra => extra.name !== name);
-            }
-            
-            updatePrice();
-        });
-    });
 
     // Handle close
     const closeButton = modal.querySelector('.close-modal');
@@ -575,6 +602,19 @@ function openModal(item) {
         modal.classList.remove('show');
         setTimeout(() => modal.remove(), 300);
     });
+}
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.className = 'cart-notification';
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.classList.add('show'), 10);
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 2000);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
