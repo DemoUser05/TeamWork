@@ -10,6 +10,20 @@ const errorContainer = document.getElementById('error-container');
 const emailInput = document.getElementById('email');
 const passwordInput = document.getElementById('password');
 
+// Функція для отримання параметрів URL
+function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  return {
+    returnUrl: params.get('returnUrl') || 'profile.html'
+  };
+}
+
+// Функція для перенаправлення після успішного входу
+function redirectAfterLogin() {
+  const { returnUrl } = getUrlParams();
+  window.location.href = returnUrl;
+}
+
 // Функція входу по email та паролю
 window.login = async () => {
   clearErrors();
@@ -23,7 +37,7 @@ window.login = async () => {
 
   try {
     await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
-    window.location.href = "profile.html";
+    redirectAfterLogin();
   } catch (error) {
     handleLoginError(error);
   }
@@ -36,7 +50,7 @@ window.googleSignIn = async () => {
   try {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
-    window.location.href = "profile.html";
+    redirectAfterLogin();
   } catch (error) {
     showError('Помилка входу через Google: ' + error.message);
   }

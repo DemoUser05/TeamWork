@@ -238,10 +238,20 @@ document.addEventListener('DOMContentLoaded', () => {
         saveCitySelection(e.target.value);
     });
 
-    // Cart icon handler
+    // Cart icon handler with proper auth check
     if (cartIcon) {
         cartIcon.addEventListener('click', () => {
-            window.location.href = 'order.html';
+            // Перевіряємо чи користувач авторизований через Firebase
+            const unsubscribe = auth.onAuthStateChanged((user) => {
+                unsubscribe(); // Відписуємось від слухача після перевірки
+                if (!user) {
+                    // Зберігаємо поточний URL для повернення після логіну
+                    const returnUrl = encodeURIComponent('order.html');
+                    window.location.href = `login.html?returnUrl=${returnUrl}`;
+                    return;
+                }
+                window.location.href = 'order.html';
+            });
         });
     }
 
@@ -578,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Function to check if user is logged in
 function isUserLoggedIn() {
-    return localStorage.getItem('user') !== null;
+    return auth.currentUser !== null;
 }
 
 // Function to update auth section based on login state
@@ -586,7 +596,8 @@ function updateAuthSection() {
     const authButtons = document.querySelector('.auth-buttons');
     if (!authButtons) return;
 
-    if (isUserLoggedIn()) {
+    const user = auth.currentUser;
+    if (user) {
         authButtons.innerHTML = `
             <a href="profile.html" class="btn">
                 <img src="images/profile.png" alt="Profile" style="width: 24px; height: 24px; filter: brightness(0) invert(1);" />

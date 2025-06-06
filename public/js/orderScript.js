@@ -10,7 +10,27 @@ let currentAddress = {
 let addressModal;
 let cartService;
 
-document.addEventListener('DOMContentLoaded', function() {
+// Функція для перевірки автентифікації
+async function checkAuth() {
+  return new Promise((resolve) => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      unsubscribe(); // Відписуємось від слухача після першої перевірки
+      if (!user) {
+        // Зберігаємо поточний URL для повернення після логіну
+        const returnUrl = encodeURIComponent(window.location.pathname);
+        window.location.href = `login.html?returnUrl=${returnUrl}`;
+        resolve(false);
+      }
+      resolve(true);
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async function() {
+  // Перевіряємо автентифікацію перед ініціалізацією сторінки
+  const isAuthenticated = await checkAuth();
+  if (!isAuthenticated) return;
+
   // Ініціалізуємо CartService
   cartService = new CartService();
   
