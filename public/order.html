@@ -42,6 +42,8 @@
           <i class="bi bi-pencil"></i>
         </button>
       </div>
+      <div class="address-text mt-2">Натисніть щоб обрати адресу</div>
+      <input type="hidden" id="address" name="address" required>
     </div>
 
     <!-- Коментар для кур'єра -->
@@ -50,7 +52,7 @@
         <i class="bi bi-chat-text"></i> Коментар для кур'єра
       </label>
       <div class="comment-container">
-        <textarea class="form-control" rows="3" id="courier-comment" placeholder="Вкажіть особливості доставки, номер під'їзду, поверх, тощо..."></textarea>
+        <textarea class="form-control" rows="3" id="courier-comment" placeholder="Вкажіть особливості доставки, номер під'їзду, поверх, тощо..." required></textarea>
         <button class="save-comment-btn" id="save-courier-comment">Зберегти</button>
       </div>
     </div>
@@ -63,7 +65,7 @@
         <label class="form-label d-flex align-items-center gap-2">
           <i class="bi bi-shop"></i> Ресторан
         </label>
-        <select class="form-select" id="restaurantSelect">
+        <select class="form-select" id="restaurantSelect" required>
           <option value="">Оберіть ресторан</option>
           <option value="1">вул. Шевченка, 123</option>
           <option value="2">вул. Франка, 45</option>
@@ -76,7 +78,7 @@
         <label class="form-label d-flex align-items-center gap-2">
           <i class="bi bi-clock"></i> Час отримання
         </label>
-        <input type="time" class="form-control" id="pickupTime" min="10:00" max="22:00">
+        <input type="time" class="form-control" id="pickupTime" min="10:00" max="22:00" required>
         <small class="text-dark mt-1 d-block">Ресторан працює з 10:00 до 22:00</small>
       </div>
     </div>
@@ -86,7 +88,7 @@
       <label class="form-label d-flex align-items-center gap-2 mb-0">
         <i class="bi bi-telephone"></i> Телефон
         <div id="phoneInputWrapper" class="ms-2" style="overflow: hidden; width: 0;">
-          <input type="tel" class="form-control form-control-sm" id="phone" placeholder="Введіть номер" disabled>
+          <input type="tel" class="form-control form-control-sm" id="phone" placeholder="Введіть номер" disabled required>
         </div>
       </label>
       <button class="btn btn-outline-light btn-sm rounded-circle d-flex align-items-center justify-content-center p-2" style="width: 32px; height: 32px;" onclick="togglePhoneEdit()" aria-label="Редагувати телефон">
@@ -122,7 +124,7 @@
       <i class="bi bi-chat-text"></i> Коментар до замовлення
     </label>
     <div class="comment-container">
-      <textarea class="form-control" rows="3" id="general-comment" placeholder="Додаткові побажання до замовлення..."></textarea>
+      <textarea class="form-control" rows="3" id="general-comment" placeholder="Додаткові побажання до замовлення..." required></textarea>
       <button class="save-comment-btn" id="save-general-comment">Зберегти</button>
     </div>
   </div>
@@ -176,31 +178,31 @@
             <div class="col-md-6">
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-building"></i></span>
-                <input type="text" id="city" class="form-control" placeholder="Місто" autocomplete="address-level2">
+                <input type="text" id="city" class="form-control" placeholder="Місто" autocomplete="address-level2" required>
               </div>
             </div>
             <div class="col-md-6">
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-signpost"></i></span>
-                <input type="text" id="street" class="form-control" placeholder="Вулиця" autocomplete="address-line1">
+                <input type="text" id="street" class="form-control" placeholder="Вулиця" autocomplete="address-line1" required>
               </div>
             </div>
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-layers"></i></span>
-                <input type="text" id="floor" class="form-control" placeholder="Поверх">
+                <input type="text" id="floor" class="form-control" placeholder="Поверх" required>
               </div>
             </div>
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-door-open"></i></span>
-                <input type="text" id="apartment" class="form-control" placeholder="Квартира">
+                <input type="text" id="apartment" class="form-control" placeholder="Квартира" required>
               </div>
             </div>
             <div class="col-md-4">
               <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-box-arrow-in-right"></i></span>
-                <input type="text" id="entrance" class="form-control" placeholder="Під'їзд">
+                <input type="text" id="entrance" class="form-control" placeholder="Під'їзд" required>
               </div>
             </div>
           </div>

@@ -29,17 +29,39 @@ document.addEventListener('DOMContentLoaded', function() {
     // Відображення підсумку
     function displaySummary() {
         const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const deliveryFee = 50;
-        const total = subtotal + deliveryFee;
+        const deliveryFee = subtotal >= 500 ? 0 : 50;
+        const serviceFee = 20; // Сервісний збір
+        
+        // Перевіряємо чи є активний промокод
+        const activePromoCode = localStorage.getItem('activePromoCode');
+        let discount = 0;
+        if (activePromoCode === 'DRIBKAFWXYZM') {
+            discount = subtotal * 0.1; // 10% знижка
+        }
+        
+        const total = subtotal + deliveryFee + serviceFee - discount;
 
         summary.innerHTML = `
             <li class="d-flex justify-content-between">
                 <span class="item-name">Сума замовлення</span>
                 <span class="item-price">${subtotal.toFixed(2)} ₴</span>
             </li>
+            ${discount > 0 ? `
+            <li class="d-flex justify-content-between text-success">
+                <span class="item-name">Знижка (Промокод)</span>
+                <span class="item-price">-${discount.toFixed(2)} ₴</span>
+            </li>
+            ` : ''}
             <li class="d-flex justify-content-between">
                 <span class="item-name">Доставка</span>
-                <span class="item-price">${deliveryFee.toFixed(2)} ₴</span>
+                <div class="d-flex flex-column align-items-end">
+                    <span class="item-price">${deliveryFee.toFixed(2)} ₴</span>
+                    ${subtotal >= 500 ? '<small class="text-success">Безкоштовно при замовленні від 500 грн</small>' : ''}
+                </div>
+            </li>
+            <li class="d-flex justify-content-between">
+                <span class="item-name">Сервісний збір</span>
+                <span class="item-price">${serviceFee.toFixed(2)} ₴</span>
             </li>
             <li class="d-flex justify-content-between">
                 <span class="item-name fw-bold">Загальна сума</span>

@@ -129,7 +129,7 @@ function setupEventListeners() {
 function checkAuthState() {
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
-      window.location.href = "login.html";
+      window.location.href = "index.html";
       return;
     }
     
@@ -213,7 +213,7 @@ async function handleProfileUpdate(e) {
 
 // Generate promo code
 function generatePromoCode() {
-  const code = 'DRIBKA' + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const code = 'DRIBKAFWXYZM';
   if (elements.promoCodeDisplay) {
     elements.promoCodeDisplay.textContent = code;
   }
@@ -407,7 +407,7 @@ function showToast(message) {
 window.logout = async function() {
   try {
     await signOut(auth);
-    window.location.href = "login.html";
+    window.location.href = "index.html";
   } catch (error) {
     console.error("Error signing out:", error);
     showToast("Помилка виходу з системи");

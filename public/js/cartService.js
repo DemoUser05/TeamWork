@@ -78,30 +78,16 @@ class CartService {
     // Clear cart
     clearCart() {
         this.cart = [];
-        this.promoApplied = false; // Reset promo when cart is cleared
         this.saveCart();
         this.updateCartIcon();
     }
 
-    // Update cart icon with items count
+    // Update cart icon
     updateCartIcon() {
         const cartIcon = document.querySelector('.cart-icon');
         if (cartIcon) {
-            const count = this.getItemsCount();
-            
-            // Remove existing badge if any
-            const existingBadge = document.querySelector('.cart-badge');
-            if (existingBadge) {
-                existingBadge.remove();
-            }
-
-            // Add new badge if count > 0
-            if (count > 0) {
-                const badge = document.createElement('span');
-                badge.className = 'cart-badge';
-                badge.textContent = count;
-                cartIcon.parentElement.appendChild(badge);
-            }
+            const itemCount = this.cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartIcon.setAttribute('data-count', itemCount);
         }
     }
 
@@ -140,6 +126,7 @@ class CartService {
         const promoCode = 'DRIBKAFWXYZM';
         if (code.toUpperCase() === promoCode) {
             this.promoApplied = true;
+            localStorage.setItem('activePromoCode', promoCode);
             this.showNotification('Промокод успішно активовано! Знижка 10% застосована');
             return true;
         }
@@ -148,12 +135,11 @@ class CartService {
 
     // Check if promo is applied
     isPromoApplied() {
-        return this.promoApplied;
+        return this.promoApplied || localStorage.getItem('activePromoCode') === 'DRIBKAFWXYZM';
     }
 
     // Handle payment completion
     handlePaymentComplete() {
         this.clearCart();
-        this.promoApplied = false;
     }
 } 

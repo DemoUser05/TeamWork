@@ -12,10 +12,12 @@ const passwordInput = document.getElementById('password');
 
 // Функція входу по email та паролю
 window.login = async () => {
-  errorContainer.textContent = '';
+  clearErrors();
   
   if (!emailInput.value || !passwordInput.value) {
     showError('Будь ласка, заповніть всі поля');
+    if (!emailInput.value) highlightError(emailInput);
+    if (!passwordInput.value) highlightError(passwordInput);
     return;
   }
 
@@ -29,6 +31,8 @@ window.login = async () => {
 
 // Функція входу через Google
 window.googleSignIn = async () => {
+  clearErrors();
+  
   try {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
@@ -40,8 +44,11 @@ window.googleSignIn = async () => {
 
 // Функція скидання пароля
 window.resetPassword = async () => {
+  clearErrors();
+  
   if (!emailInput.value) {
     showError('Введіть email для скидання пароля');
+    highlightError(emailInput);
     return;
   }
 
@@ -49,7 +56,7 @@ window.resetPassword = async () => {
     await sendPasswordResetEmail(auth, emailInput.value);
     showError('Лист для скидання пароля надіслано на ' + emailInput.value, false);
   } catch (error) {
-    showError('Помилка: ' + error.message);
+    handleResetError(error);
   }
 };
 
@@ -60,15 +67,19 @@ function handleLoginError(error) {
   switch (error.code) {
     case 'auth/invalid-email':
       errorMessage = 'Невірний формат email';
+      highlightError(emailInput);
       break;
     case 'auth/user-disabled':
       errorMessage = 'Акаунт заблоковано';
       break;
     case 'auth/user-not-found':
-      errorMessage = 'Акаунт не знайдено';
+      errorMessage = 'Користувача з таким email не знайдено';
+      highlightError(emailInput);
       break;
     case 'auth/wrong-password':
       errorMessage = 'Невірний пароль';
+      highlightError(passwordInput);
+      passwordInput.value = ''; // Очищаємо поле пароля
       break;
     case 'auth/too-many-requests':
       errorMessage = 'Забагато спроб. Спробуйте пізніше або скиньте пароль';
@@ -78,12 +89,61 @@ function handleLoginError(error) {
   }
   
   showError(errorMessage);
+  shakeForm();
+}
+
+// Обробка помилок скидання пароля
+function handleResetError(error) {
+  let errorMessage = '';
+  
+  switch (error.code) {
+    case 'auth/invalid-email':
+      errorMessage = 'Невірний формат email';
+      highlightError(emailInput);
+      break;
+    case 'auth/user-not-found':
+      errorMessage = 'Користувача з таким email не знайдено';
+      highlightError(emailInput);
+      break;
+    default:
+      errorMessage = 'Помилка скидання пароля: ' + error.message;
+  }
+  
+  showError(errorMessage);
 }
 
 // Показати повідомлення про помилку
 function showError(message, isError = true) {
   errorContainer.textContent = message;
   errorContainer.style.color = isError ? '#ff4444' : '#00C851';
+  errorContainer.classList.add('show');
+}
+
+// Підсвітити поле з помилкою
+function highlightError(input) {
+  input.classList.add('input-error');
+  input.addEventListener('input', function removeError() {
+    input.classList.remove('input-error');
+    input.removeEventListener('input', removeError);
+  });
+}
+
+// Очистити всі помилки
+function clearErrors() {
+  errorContainer.classList.remove('show');
+  errorContainer.textContent = '';
+  document.querySelectorAll('.input-error').forEach(input => {
+    input.classList.remove('input-error');
+  });
+}
+
+// Анімація струсу форми при помилці
+function shakeForm() {
+  const form = document.querySelector('.login-container');
+  form.style.animation = 'shake 0.5s ease';
+  setTimeout(() => {
+    form.style.animation = '';
+  }, 500);
 }
 
 // Дозволити відправку форми по Enter

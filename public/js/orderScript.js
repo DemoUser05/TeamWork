@@ -291,11 +291,80 @@ function updateSummary() {
 
 function updatePaymentButtonState() {
   const paymentBtn = document.querySelector('.payment-btn');
-  if (paymentBtn) {
-    const items = cartService.cart || [];
-    paymentBtn.disabled = items.length === 0;
+  if (!paymentBtn) return;
+
+  const items = cartService.cart || [];
+  const isDelivery = document.getElementById('deliveryBtn').classList.contains('btn-dark');
+  const phone = document.getElementById('phone')?.value.trim();
+  
+  let isValid = items.length > 0;
+  let errorMessage = '';
+
+  if (isValid) {
+    if (isDelivery) {
+      const address = document.getElementById('address')?.value.trim();
+      if (!address) {
+        isValid = false;
+        errorMessage = 'Будь ласка, вкажіть адресу доставки';
+      }
+    } else {
+      const restaurant = document.getElementById('restaurantSelect')?.value;
+      const pickupTime = document.getElementById('pickupTime')?.value;
+      if (!restaurant || !pickupTime) {
+        isValid = false;
+        errorMessage = 'Будь ласка, виберіть ресторан та час самовивозу';
+      }
+    }
+
+    if (!phone) {
+      isValid = false;
+      errorMessage = errorMessage || 'Будь ласка, вкажіть номер телефону';
+    } else if (!validatePhoneNumber(phone)) {
+      isValid = false;
+      errorMessage = 'Будь ласка, вкажіть коректний номер телефону';
+    }
+  }
+
+  paymentBtn.disabled = !isValid;
+  
+  // Update validation message
+  let validationMessage = document.querySelector('.validation-message');
+  if (!validationMessage) {
+    validationMessage = document.createElement('div');
+    validationMessage.className = 'validation-message';
+    paymentBtn.parentNode.insertBefore(validationMessage, paymentBtn);
+  }
+
+  if (!isValid && errorMessage) {
+    validationMessage.textContent = errorMessage;
+    validationMessage.style.display = 'block';
+    validationMessage.classList.add('show');
+  } else {
+    validationMessage.style.display = 'none';
+    validationMessage.classList.remove('show');
   }
 }
+
+// Add input event listeners for validation
+document.addEventListener('DOMContentLoaded', function() {
+  const inputFields = [
+    'phone',
+    'address',
+    'restaurantSelect',
+    'pickupTime'
+  ];
+
+  inputFields.forEach(fieldId => {
+    const field = document.getElementById(fieldId);
+    if (field) {
+      field.addEventListener('input', updatePaymentButtonState);
+      field.addEventListener('change', updatePaymentButtonState);
+    }
+  });
+
+  // Initial validation check
+  updatePaymentButtonState();
+});
 
 function applyPromo() {
   const promoInput = document.getElementById("promo");
@@ -414,7 +483,17 @@ function updateAddressDisplay() {
     if (currentAddress.entrance) parts.push(`під'їзд ${currentAddress.entrance}`);
     if (currentAddress.floor) parts.push(`поверх ${currentAddress.floor}`);
     
-    addressText.textContent = parts.join(', ');
+    const fullAddress = parts.join(', ');
+    addressText.textContent = fullAddress;
+    
+    // Оновлюємо приховане поле адреси для валідації
+    const addressInput = document.getElementById('address');
+    if (addressInput) {
+      addressInput.value = fullAddress;
+    }
+    
+    // Запускаємо перевірку стану кнопки оплати
+    updatePaymentButtonState();
   }
 }
 
