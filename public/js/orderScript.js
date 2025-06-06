@@ -110,6 +110,9 @@ function renderOrder() {
   
   container.innerHTML = "";
 
+  // Оновлюємо cartService.cart з localStorage перед рендером
+  cartService.cart = JSON.parse(localStorage.getItem('cart')) || [];
+
   // Отримуємо страви з CartService
   const items = cartService.cart;
 
@@ -847,6 +850,11 @@ function handlePayment() {
 
   // Імітуємо обробку замовлення
   setTimeout(() => {
+    // Зберігаємо назви страв у localStorage для профілю користувача
+    const orderNames = JSON.parse(localStorage.getItem('profileOrderNames')) || [];
+    const newNames = cartService.cart.map(item => item.name);
+    localStorage.setItem('profileOrderNames', JSON.stringify(orderNames.concat(newNames)));
+
     // Очищаємо кошик і скидаємо промокод
     cartService.handlePaymentComplete();
     
@@ -877,36 +885,26 @@ function showErrorMessage(message) {
   }, 3000);
 }
 
-// Функція для розрахунку загальної суми
 function calculateTotal() {
   let total = 0;
-  
-  // Сума товарів
-  cartService.cart.forEach(item => {
-    total += item.price * item.quantity;
+  let subtotal = 0;
+
+  items.forEach(item => {
+    subtotal += item.price * item.qty;
   });
 
-  // Знижка по промокоду (якщо є)
-  const promoDiscount = document.querySelector('.promo-discount');
-  if (promoDiscount) {
-    const discountAmount = parseFloat(promoDiscount.textContent);
-    if (!isNaN(discountAmount)) {
-      total -= discountAmount;
-    }
+  total = subtotal;
+  
+  if (discount > 0) {
+    total -= discount;
   }
 
-  // Вартість доставки
   const isDelivery = document.getElementById('deliveryBtn').classList.contains('btn-dark');
-  if (isDelivery) {
-    const deliveryFee = 60; // Фіксована вартість доставки
-    if (total < 500) { // Якщо сума менше 500 грн
-      total += deliveryFee;
-    }
+  if (isDelivery && subtotal < 500) {
+    total += 60; // Вартість доставки
   }
 
-  // Сервісний збір
-  const serviceFee = 20;
-  total += serviceFee;
+  total += 20; // Сервісний збір
 
   return total;
 }
