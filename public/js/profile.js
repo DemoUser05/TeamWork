@@ -11,7 +11,6 @@ import {
 const auth = window.auth;
 const db = window.db;
 
-// DOM Elements
 const elements = {
   backBtn: document.getElementById('backBtn'),
   cartBtn: document.getElementById('cartBtn'),
@@ -49,7 +48,6 @@ const elements = {
   nameValue: document.getElementById('nameValue')
 };
 
-// Subscription plans
 const SUBSCRIPTION_PLANS = {
   basic: {
     id: 'basic',
@@ -83,21 +81,17 @@ const SUBSCRIPTION_DURATIONS = [
   { months: 12, name: '12 місяців', multiplier: 10 }
 ];
 
-// Initialize the page
 document.addEventListener('DOMContentLoaded', () => {
   setupEventListeners();
   checkAuthState();
   initializeSubscriptions();
 });
 
-// Set up event listeners
 function setupEventListeners() {
-  // Profile editing
   elements.editProfileBtn?.addEventListener('click', () => showModal(elements.editProfileModal));
   elements.closeEditModal?.addEventListener('click', () => hideModal(elements.editProfileModal));
   elements.profileForm?.addEventListener('submit', handleProfileUpdate);
 
-  // Menu items
   elements.subscriptionsBtn?.addEventListener('click', () => {
     showSubscriptionPlans();
     showModal(elements.subscriptionsModal);
@@ -117,7 +111,6 @@ function setupEventListeners() {
   elements.favoritesBtn?.addEventListener('click', () => showModal(elements.favoritesModal));
   elements.closeFavoritesModal?.addEventListener('click', () => hideModal(elements.favoritesModal));
 
-  // Close modals when clicking outside
   window.addEventListener('click', (e) => {
     if (e.target.classList.contains('modal')) {
       hideAllModals();
@@ -125,7 +118,6 @@ function setupEventListeners() {
   });
 }
 
-// Check authentication state
 function checkAuthState() {
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -150,21 +142,17 @@ function checkAuthState() {
   });
 }
 
-// Update user profile information
 function updateUserProfile(user, userData) {
-  // Update avatar - використовуємо ім'я з userData, якщо воно є, інакше використовуємо displayName з user
   const name = userData.name || user.displayName || '';
   const firstLetter = name ? name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U');
   
   if (elements.avatarLarge) elements.avatarLarge.textContent = firstLetter;
   if (elements.avatarSmall) elements.avatarSmall.textContent = firstLetter;
 
-  // Update profile information
   if (elements.phoneValue) elements.phoneValue.textContent = userData.phone || 'Не вказано';
   if (elements.emailValue) elements.emailValue.textContent = userData.email || user.email || 'Не вказано';
   if (elements.nameValue) elements.nameValue.textContent = userData.name || user.displayName || 'Не вказано';
 
-  // Update form values
   const nameInput = document.getElementById('name');
   const emailInput = document.getElementById('email');
   const phoneInput = document.getElementById('phone');
@@ -174,7 +162,6 @@ function updateUserProfile(user, userData) {
   if (phoneInput) phoneInput.value = userData.phone || '';
 }
 
-// Handle profile update
 async function handleProfileUpdate(e) {
   e.preventDefault();
   
@@ -211,7 +198,6 @@ async function handleProfileUpdate(e) {
   }
 }
 
-// Generate promo code
 function generatePromoCode() {
   const code = 'DRIBKAFWXYZM';
   if (elements.promoCodeDisplay) {
@@ -219,7 +205,6 @@ function generatePromoCode() {
   }
 }
 
-// Copy promo code
 function copyPromoCode() {
   const code = elements.promoCodeDisplay.textContent;
   navigator.clipboard.writeText(code)
@@ -227,7 +212,6 @@ function copyPromoCode() {
     .catch(() => showToast("Помилка копіювання"));
 }
 
-// Modal functions
 function showModal(modal) {
   if (!modal) return;
   modal.style.display = 'flex';
@@ -247,18 +231,14 @@ function hideAllModals() {
   document.body.style.overflow = 'auto';
 }
 
-// Initialize subscriptions
 function initializeSubscriptions() {
   if (!elements.subscriptionsList) return;
   
-  // Clear existing content
   elements.subscriptionsList.innerHTML = '';
   
-  // Create subscription plans container
   const plansContainer = document.createElement('div');
   plansContainer.className = 'subscription-plans';
   
-  // Add subscription plans
   Object.values(SUBSCRIPTION_PLANS).forEach(plan => {
     const planElement = createSubscriptionPlanElement(plan);
     plansContainer.appendChild(planElement);
@@ -267,7 +247,6 @@ function initializeSubscriptions() {
   elements.subscriptionsList.appendChild(plansContainer);
 }
 
-// Create subscription plan element
 function createSubscriptionPlanElement(plan) {
   const planDiv = document.createElement('div');
   planDiv.className = 'subscription-plan';
@@ -280,14 +259,12 @@ function createSubscriptionPlanElement(plan) {
     <button class="subscribe-btn" data-plan="${plan.id}">Обрати план</button>
   `;
   
-  // Add click handler for subscribe button
   const subscribeBtn = planDiv.querySelector('.subscribe-btn');
   subscribeBtn.addEventListener('click', () => showDurationOptions(plan));
   
   return planDiv;
 }
 
-// Show subscription duration options
 function showDurationOptions(plan) {
   const modalContent = elements.subscriptionsModal.querySelector('.modal-content');
   modalContent.innerHTML = `
@@ -318,30 +295,24 @@ function showDurationOptions(plan) {
     <button class="back-btn" onclick="showSubscriptionPlans()">← Назад до планів</button>
   `;
   
-  // Add click handlers for duration options
   const durationOptions = modalContent.querySelectorAll('.duration-option');
   const confirmBtn = modalContent.querySelector('#confirmSubscription');
   const totalAmount = modalContent.querySelector('.total-amount');
   
   durationOptions.forEach(option => {
     option.addEventListener('click', () => {
-      // Remove selected class from all options
       durationOptions.forEach(opt => opt.classList.remove('selected'));
-      // Add selected class to clicked option
       option.classList.add('selected');
       
-      // Update total amount
       const months = parseInt(option.dataset.months);
       const duration = SUBSCRIPTION_DURATIONS.find(d => d.months === months);
       const total = Math.round(plan.price * duration.multiplier);
       totalAmount.textContent = `${total} грн`;
       
-      // Enable confirm button
       confirmBtn.disabled = false;
     });
   });
   
-  // Add click handler for confirm button
   confirmBtn.addEventListener('click', async () => {
     const selectedOption = modalContent.querySelector('.duration-option.selected');
     if (!selectedOption) return;
@@ -351,11 +322,9 @@ function showDurationOptions(plan) {
     const total = Math.round(plan.price * duration.multiplier);
     
     try {
-      // Get current user
       const user = auth.currentUser;
       if (!user) throw new Error('Користувач не авторизований');
       
-      // Add subscription to user's subscriptions
       const subscriptionData = {
         planId: plan.id,
         planName: plan.name,
@@ -367,10 +336,8 @@ function showDurationOptions(plan) {
       
       await setDoc(doc(db, "users", user.uid, "subscriptions", plan.id), subscriptionData);
       
-      // Show success message
       showToast('Підписку успішно оформлено!');
       
-      // Close modal
       hideModal(elements.subscriptionsModal);
       
     } catch (error) {
@@ -380,30 +347,25 @@ function showDurationOptions(plan) {
   });
 }
 
-// Show subscription plans
 function showSubscriptionPlans() {
   if (!elements.subscriptionsModal) return;
   initializeSubscriptions();
 }
 
-// Show toast notification
 function showToast(message) {
   const toast = document.createElement('div');
   toast.className = 'toast';
   toast.textContent = message;
   document.body.appendChild(toast);
   
-  // Show toast
   setTimeout(() => toast.classList.add('show'), 100);
   
-  // Hide and remove toast
   setTimeout(() => {
     toast.classList.remove('show');
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
 
-// Logout function
 window.logout = async function() {
   try {
     await signOut(auth);
