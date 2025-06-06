@@ -3,6 +3,8 @@ class CartService {
     constructor() {
         this.cart = JSON.parse(localStorage.getItem('cart')) || [];
         this.updateCartIcon();
+        // Тригеримо подію оновлення при ініціалізації
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
     }
 
     // Add item to cart
@@ -12,20 +14,26 @@ class CartService {
             JSON.stringify(i.extras) === JSON.stringify(extras)
         );
 
+        const itemTotal = this.calculateItemTotal(item, extras);
+
         if (existingItem) {
             existingItem.quantity += quantity;
+            existingItem.totalPrice = itemTotal * existingItem.quantity;
         } else {
             this.cart.push({
                 ...item,
                 extras,
                 quantity,
-                totalPrice: this.calculateItemTotal(item, extras) * quantity
+                totalPrice: itemTotal * quantity
             });
         }
 
         this.saveCart();
         this.updateCartIcon();
         this.showNotification('Додано до кошика');
+        
+        // Trigger cart update event
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
     }
 
     // Remove item from cart
@@ -33,6 +41,9 @@ class CartService {
         this.cart.splice(index, 1);
         this.saveCart();
         this.updateCartIcon();
+        
+        // Trigger cart update event
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
     }
 
     // Update item quantity
@@ -42,13 +53,16 @@ class CartService {
         
         if (newQuantity === 0) {
             this.removeItem(index);
-        } else {
-            item.quantity = newQuantity;
-            item.totalPrice = this.calculateItemTotal(item, item.extras) * newQuantity;
-            this.saveCart();
+            return; // removeItem вже тригерить подію оновлення
         }
         
+        item.quantity = newQuantity;
+        item.totalPrice = this.calculateItemTotal(item, item.extras) * newQuantity;
+        this.saveCart();
         this.updateCartIcon();
+        
+        // Trigger cart update event
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
     }
 
     // Calculate total price for an item with extras
@@ -77,6 +91,9 @@ class CartService {
         this.cart = [];
         this.saveCart();
         this.updateCartIcon();
+        
+        // Trigger cart update event
+        window.dispatchEvent(new CustomEvent('cartUpdated'));
     }
 
     // Update cart icon with items count

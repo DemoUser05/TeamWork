@@ -1,6 +1,12 @@
 // Initialize cart service
 const cartService = new CartService();
 
+// Listen for cart updates
+window.addEventListener('cartUpdated', () => {
+    renderOrder();
+    updateSummary();
+});
+
 function renderOrder() {
     const container = document.getElementById("order-items");
     container.innerHTML = "";
@@ -10,9 +16,10 @@ function renderOrder() {
             <div class="empty-cart">
                 <i class="bi bi-cart3"></i>
                 <p>Ваш кошик порожній</p>
-                <a href="index.html" class="btn btn-outline-light">Перейти до меню</a>
+                <a href="menu.html" class="btn btn-outline-light">Перейти до меню</a>
             </div>
         `;
+        updateSummary();
         return;
     }
 
@@ -26,7 +33,7 @@ function renderOrder() {
                 <div class="text-muted small">
                     ${item.extras.map(extra => `${extra.name}`).join(', ')}
                 </div>
-                <div class="price">${item.price} грн</div>
+                <div class="price">${item.totalPrice} грн</div>
             </div>
             <div class="quantity-controls">
                 <button class="btn btn-sm" onclick="cartService.updateQuantity(${index}, -1)">-</button>
@@ -51,10 +58,10 @@ function updateSummary() {
     list.appendChild(subtotalItem);
 
     // Delivery fee
-    const deliveryFee = subtotal >= 500 ? 0 : 60;
+    const deliveryFee = subtotal >= 500 ? 0 : (subtotal > 0 ? 60 : 0);
     const deliveryItem = document.createElement("li");
     deliveryItem.innerHTML = deliveryFee === 0
-        ? `<span>Доставка</span><span class="text-success">Безкоштовно</span>`
+        ? `<span>Доставка</span><span class="text-success">${subtotal >= 500 ? 'Безкоштовно' : '0 ₴'}</span>`
         : `<span>Доставка</span><span>${deliveryFee} ₴</span>`;
     list.appendChild(deliveryItem);
 
@@ -78,6 +85,11 @@ function updateSummary() {
 }
 
 // Handle promo code
+const promoButton = document.querySelector('.input-group .btn-outline-light');
+if (promoButton) {
+    promoButton.addEventListener('click', applyPromo);
+}
+
 function applyPromo() {
     const promoInput = document.querySelector('input[placeholder="Промокод"]');
     const code = promoInput.value.trim().toLowerCase();
@@ -88,6 +100,7 @@ function applyPromo() {
             cartService.showNotification('Промокод застосовано!');
             promoInput.style.borderColor = '#FE9A9B';
             setTimeout(() => promoInput.style.borderColor = '', 2000);
+            updateSummary();
         } else {
             cartService.showNotification('Додайте товари в кошик');
             promoInput.style.borderColor = '#dc3545';
@@ -102,6 +115,9 @@ function applyPromo() {
 
 // Handle delivery toggle
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the order page
+    renderOrder();
+
     const deliveryBtn = document.querySelector('.toggle-switch .btn-dark');
     const pickupBtn = document.querySelector('.toggle-switch .btn-light');
     
@@ -111,6 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 deliveryBtn.classList.add('active');
                 pickupBtn.classList.remove('active');
                 document.querySelector('.delivery-address').style.display = 'block';
+                updateSummary();
             }
         });
         
@@ -119,10 +136,39 @@ document.addEventListener('DOMContentLoaded', () => {
                 pickupBtn.classList.add('active');
                 deliveryBtn.classList.remove('active');
                 document.querySelector('.delivery-address').style.display = 'none';
+                updateSummary();
             }
         });
     }
 });
 
-// Initialize the order page
-renderOrder();
+function processOrder() {
+    const paymentMethod = document.querySelector('input[name="payment"]:checked');
+    
+    if (!paymentMethod) {
+        alert('Будь ласка, виберіть спосіб оплати');
+        return;
+    }
+
+    switch (paymentMethod.value) {
+        case 'card':
+            // Redirect to payment page for card payments
+            window.location.href = 'payment.html';
+            break;
+        case 'apple':
+            alert('Apple Pay поки що не підтримується');
+            break;
+        case 'cash':
+            alert('Дякуємо за замовлення! Кур\'єр зв\'яжеться з вами для уточнення деталей.');
+            cartService.clearCart();
+            window.location.href = 'index.html';
+            break;
+        case 'card_courier':
+            alert('Дякуємо за замовлення! Кур\'єр привезе термінал для оплати.');
+            cartService.clearCart();
+            window.location.href = 'index.html';
+            break;
+        default:
+            alert('Будь ласка, виберіть спосіб оплати');
+    }
+}
