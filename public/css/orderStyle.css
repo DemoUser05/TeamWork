@@ -603,3 +603,51 @@ input:focus, textarea:focus, .form-control:focus, select.form-select:focus {
 #summary .item-name.text-muted {
   font-style: italic;
 }
+
+.delivery-info {
+    margin: 10px 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+.free-delivery-message {
+    color: #28a745;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.remaining-for-free {
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.free-delivery-message i,
+.remaining-for-free i {
+    font-size: 16px;
+}
+
+.service-fee small {
+    font-size: 12px;
+    display: block;
+    margin-top: 2px;
+}
+
+.list-group-item .d-flex.flex-column {
+    gap: 4px;
+}
+
+/* Update existing styles */
+.list-group-item {
+    padding: 12px 16px;
+    border: none;
+    background: transparent;
+}
+
+.list-group-item:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+}

@@ -184,9 +184,61 @@ if (restaurantData[restaurantId]) {
 // Initialize cart service
 const cartService = new CartService();
 
+// Save delivery preference and city selection
+function saveDeliveryPreference(isDelivery) {
+    localStorage.setItem('deliveryMethod', isDelivery ? 'delivery' : 'pickup');
+}
+
+function saveCitySelection(city) {
+    localStorage.setItem('selectedCity', city);
+}
+
 // Update cart icon click handler
 document.addEventListener('DOMContentLoaded', () => {
     const cartIcon = document.querySelector('.cart-icon');
+    const deliveryBtn = document.getElementById('deliveryBtn');
+    const pickupBtn = document.getElementById('pickupBtn');
+    const citySelect = document.getElementById('city-select');
+
+    // Initialize delivery method from localStorage or default to delivery
+    const savedDeliveryMethod = localStorage.getItem('deliveryMethod') || 'delivery';
+    if (savedDeliveryMethod === 'pickup') {
+        deliveryBtn.classList.remove('active');
+        pickupBtn.classList.add('active');
+    } else {
+        deliveryBtn.classList.add('active');
+        pickupBtn.classList.remove('active');
+    }
+
+    // Initialize city selection from localStorage
+    const savedCity = localStorage.getItem('selectedCity');
+    if (savedCity) {
+        citySelect.value = savedCity;
+    }
+
+    // Delivery toggle handlers
+    deliveryBtn.addEventListener('click', () => {
+        if (!deliveryBtn.classList.contains('active')) {
+            deliveryBtn.classList.add('active');
+            pickupBtn.classList.remove('active');
+            saveDeliveryPreference(true);
+        }
+    });
+
+    pickupBtn.addEventListener('click', () => {
+        if (!pickupBtn.classList.contains('active')) {
+            pickupBtn.classList.add('active');
+            deliveryBtn.classList.remove('active');
+            saveDeliveryPreference(false);
+        }
+    });
+
+    // City selection handler
+    citySelect.addEventListener('change', (e) => {
+        saveCitySelection(e.target.value);
+    });
+
+    // Cart icon handler
     if (cartIcon) {
         cartIcon.addEventListener('click', () => {
             window.location.href = 'order.html';
@@ -318,22 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
             filteredFullMenu = applySort(filteredFullMenu);
             renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
             renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
-        });
-    }
-
-    // Delivery/Pickup toggle
-    const deliveryBtn = document.querySelector('.delivery');
-    const pickupBtn = document.querySelector('.pickup');
-
-    if (deliveryBtn && pickupBtn) {
-        deliveryBtn.addEventListener('click', () => {
-            deliveryBtn.classList.add('active');
-            pickupBtn.classList.remove('active');
-        });
-
-        pickupBtn.addEventListener('click', () => {
-            pickupBtn.classList.add('active');
-            deliveryBtn.classList.remove('active');
         });
     }
 

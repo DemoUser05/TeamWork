@@ -25,6 +25,63 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Встановлюємо початковий стан кнопки оплати
   updatePaymentButtonState();
+
+  // Initialize delivery method from localStorage
+  const savedDeliveryMethod = localStorage.getItem('deliveryMethod') || 'delivery';
+  const deliveryBtn = document.getElementById('deliveryBtn');
+  const pickupBtn = document.getElementById('pickupBtn');
+  
+  if (savedDeliveryMethod === 'pickup') {
+    pickupBtn.classList.add('btn-dark');
+    deliveryBtn.classList.remove('btn-dark');
+    document.getElementById('deliverySection').style.display = 'none';
+    document.getElementById('pickupSection').style.display = 'block';
+  } else {
+    deliveryBtn.classList.add('btn-dark');
+    pickupBtn.classList.remove('btn-dark');
+    document.getElementById('deliverySection').style.display = 'block';
+    document.getElementById('pickupSection').style.display = 'none';
+  }
+
+  // Initialize city selection from localStorage
+  const savedCity = localStorage.getItem('selectedCity');
+  if (savedCity) {
+    const citySelect = document.getElementById('city-select');
+    if (citySelect) {
+      citySelect.value = savedCity;
+    }
+  }
+
+  // Add event listeners for delivery method toggle
+  deliveryBtn.addEventListener('click', function() {
+    if (!this.classList.contains('btn-dark')) {
+      this.classList.add('btn-dark');
+      pickupBtn.classList.remove('btn-dark');
+      document.getElementById('deliverySection').style.display = 'block';
+      document.getElementById('pickupSection').style.display = 'none';
+      localStorage.setItem('deliveryMethod', 'delivery');
+      updateSummary();
+    }
+  });
+
+  pickupBtn.addEventListener('click', function() {
+    if (!this.classList.contains('btn-dark')) {
+      this.classList.add('btn-dark');
+      deliveryBtn.classList.remove('btn-dark');
+      document.getElementById('deliverySection').style.display = 'none';
+      document.getElementById('pickupSection').style.display = 'block';
+      localStorage.setItem('deliveryMethod', 'pickup');
+      updateSummary();
+    }
+  });
+
+  // Add event listener for city selection
+  const citySelect = document.getElementById('city-select');
+  if (citySelect) {
+    citySelect.addEventListener('change', function(e) {
+      localStorage.setItem('selectedCity', e.target.value);
+    });
+  }
 });
 
 function renderOrder() {
@@ -128,6 +185,27 @@ function updateSummary() {
   // Перевіряємо тип доставки
   const isDelivery = document.getElementById('deliveryBtn').classList.contains('btn-dark');
 
+  // Додаємо інформацію про безкоштовну доставку
+  if (isDelivery) {
+    const deliveryInfoDiv = document.createElement('div');
+    deliveryInfoDiv.className = 'delivery-info';
+    if (originalSubtotal >= 500) {
+      deliveryInfoDiv.innerHTML = `
+        <div class="free-delivery-message">
+          <i class="fas fa-check-circle"></i>
+          Ваше замовлення підпадає під безкоштовну доставку!
+        </div>`;
+    } else {
+      const remainingForFree = 500 - originalSubtotal;
+      deliveryInfoDiv.innerHTML = `
+        <div class="remaining-for-free">
+          <i class="fas fa-info-circle"></i>
+          Додайте ще ${remainingForFree.toFixed(2)} грн для безкоштовної доставки
+        </div>`;
+    }
+    list.appendChild(deliveryInfoDiv);
+  }
+
   // Якщо кошик порожній, показуємо початковий стан
   if (items.length === 0) {
     let emptyStateHtml = `
@@ -155,13 +233,13 @@ function updateSummary() {
         <span class="item-price">0 грн</span>
       </li>`;
 
-    list.innerHTML = emptyStateHtml;
+    list.innerHTML += emptyStateHtml;
     updatePaymentButtonState();
     return;
   }
 
   // Показуємо суму замовлення
-  list.innerHTML = `
+  list.innerHTML += `
     <li class="list-group-item d-flex justify-content-between">
       <span class="item-name">Сума замовлення</span>
       <span class="item-price">${originalSubtotal.toFixed(2)} грн</span>
@@ -182,7 +260,12 @@ function updateSummary() {
     const deliveryCost = originalSubtotal < 500 ? 60 : 0;
     list.innerHTML += `
       <li class="list-group-item d-flex justify-content-between">
-        <span class="item-name service-fee">Робота кур'єра${originalSubtotal >= 500 ? ' (безкоштовно)' : ''}</span>
+        <div class="d-flex flex-column">
+          <span class="item-name service-fee">Робота кур'єра</span>
+          ${originalSubtotal >= 500 ? 
+            '<small class="text-success">Безкоштовно при замовленні від 500 грн</small>' : 
+            '<small class="text-muted">Безкоштовно при замовленні від 500 грн</small>'}
+        </div>
         <span class="item-price">${deliveryCost} грн</span>
       </li>`;
     subtotal += deliveryCost;
