@@ -2,6 +2,7 @@
 class CartService {
     constructor() {
         this.cart = JSON.parse(localStorage.getItem('cart')) || [];
+        this.promoApplied = false; // Add promoApplied as instance variable
         this.updateCartIcon();
     }
 
@@ -59,7 +60,9 @@ class CartService {
 
     // Get cart total
     getTotal() {
-        return this.cart.reduce((sum, item) => sum + item.totalPrice, 0);
+        const subtotal = this.cart.reduce((sum, item) => sum + item.totalPrice, 0);
+        const promoDiscount = this.promoApplied ? subtotal * 0.1 : 0;
+        return subtotal - promoDiscount;
     }
 
     // Get cart items count
@@ -75,6 +78,7 @@ class CartService {
     // Clear cart
     clearCart() {
         this.cart = [];
+        this.promoApplied = false; // Reset promo when cart is cleared
         this.saveCart();
         this.updateCartIcon();
     }
@@ -123,5 +127,33 @@ class CartService {
                 setTimeout(() => notification.remove(), 300);
             }, 2000);
         }, 100);
+    }
+
+    // Apply promo code
+    applyPromoCode(code) {
+        // Check if cart is empty
+        if (this.cart.length === 0) {
+            this.showNotification('Додайте страви в кошик перед використанням промокоду');
+            return false;
+        }
+
+        const promoCode = 'DRIBKAFWXYZM';
+        if (code.toUpperCase() === promoCode) {
+            this.promoApplied = true;
+            this.showNotification('Промокод успішно активовано! Знижка 10% застосована');
+            return true;
+        }
+        return false;
+    }
+
+    // Check if promo is applied
+    isPromoApplied() {
+        return this.promoApplied;
+    }
+
+    // Handle payment completion
+    handlePaymentComplete() {
+        this.clearCart();
+        this.promoApplied = false;
     }
 } 

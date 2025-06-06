@@ -444,32 +444,37 @@
 <div class="banner-carousel"></div>
 
   <script type="module">
-    // Імпорт необхідних функцій Firebase
     import { auth, db } from './firebase-config.js';
     import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
     import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js';
 
-    // Функція для оновлення профілю користувача
     function updateUserProfile(user, userData) {
       const authSection = document.getElementById('authSection');
       
-      // Визначаємо URL аватара (якщо є в userData або стандартний)
-      const photoURL = userData.photoURL || user.photoURL || 'images/profile.png';
-      
-      authSection.innerHTML = `
-        <a href="profile.html" class="profile-link">
-          <img src="${photoURL}" alt="Profile" class="profile-icon" title="${user.displayName || user.email}" />
-        </a>
-      `;
+      if (user) {
+        const name = userData.name || user.displayName || '';
+        const firstLetter = name ? name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U');
+        
+        authSection.innerHTML = `
+          <a href="profile.html" class="profile-link">
+            <div class="profile-icon" title="${name || user.email}">${firstLetter}</div>
+          </a>
+        `;
+      } else {
+        authSection.innerHTML = `
+          <div class="auth-buttons">
+            <a href="login.html" class="btn btn-outline">Увійти</a>
+            <a href="register.html" class="btn">Реєстрація</a>
+          </div>
+        `;
+      }
     }
 
-    // Перевірка стану авторизації
     function checkAuthState() {
       onAuthStateChanged(auth, async (user) => {
         const authSection = document.getElementById('authSection');
         
         if (!user) {
-          // Користувач не авторизований - показуємо кнопки входу
           authSection.innerHTML = `
             <div class="auth-buttons">
               <a href="login.html" class="btn btn-outline">Увійти</a>
@@ -480,7 +485,6 @@
         }
         
         try {
-          // Отримуємо додаткові дані користувача з Firestore
           const userRef = doc(db, "users", user.uid);
           const docSnap = await getDoc(userRef);
           
@@ -492,13 +496,11 @@
           }
         } catch (error) {
           console.error("Помилка завантаження даних користувача:", error);
-          // У випадку помилки все одно показуємо аватар з основними даними
           updateUserProfile(user, {});
         }
       });
     }
 
-    // Викликаємо перевірку при завантаженні сторінки
     document.addEventListener('DOMContentLoaded', checkAuthState);
   </script>
   <script src="js/main.js"></script>

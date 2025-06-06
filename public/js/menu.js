@@ -197,106 +197,105 @@ document.addEventListener('DOMContentLoaded', () => {
     renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
     renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
 
-    // Initialize filter button
-    const filterBtn = document.getElementById("filter-btn");
-    if (filterBtn) {
-        filterBtn.addEventListener("click", () => {
-            const filterModal = document.createElement("div");
-            filterModal.classList.add("modal");
-            filterModal.innerHTML = `
-                <div class="modal-content filter-modal-content">
-                    <span class="close-modal">×</span>
-                    <h2>Фільтри</h2>
-                    <div class="filter-section">
-                        <h3>Категорія</h3>
-                        <label><input type="checkbox" class="filter-checkbox" data-filter="category" value="М'ясо"> М'ясо</label>
-                        <label><input type="checkbox" class="filter-checkbox" data-filter="category" value="Десерти"> Десерти</label>
-                        <label><input type="checkbox" class="filter-checkbox" data-filter="category" value="Фастфуд"> Фастфуд</label>
-                    </div>
-                    <div class="filter-section">
-                        <h3>Діапазон цін</h3>
-                        <label>Від: <input type="number" id="price-min" value="0" min="0"></label>
-                        <label>До: <input type="number" id="price-max" value="1000" min="0"></label>
-                    </div>
-                    <div class="filter-section">
-                        <h3>Рейтинг</h3>
-                        <label>Вище: <input type="number" id="rating-min" value="80" min="0" max="100">%</label>
-                    </div>
-                    <button id="apply-filters">Застосувати</button>
-                    <button id="reset-filters">Скинути</button>
-                </div>
-            `;
-            document.body.appendChild(filterModal);
-            filterModal.classList.add("show");
+    // Filter modal functionality
+    const filterBtn = document.getElementById('filter-btn');
+    const filterModal = document.getElementById('filterModal');
+    const applyBtn = document.querySelector('.apply-btn');
+    const resetBtn = document.querySelector('.reset-btn');
 
-            const closeButton = filterModal.querySelector(".close-modal");
-            closeButton.addEventListener("click", () => {
-                filterModal.classList.remove("show");
-                setTimeout(() => filterModal.remove(), 300);
-            });
+    // Open modal
+    filterBtn.addEventListener('click', () => {
+        filterModal.style.display = 'flex';
+    });
 
-            filterModal.addEventListener("click", (e) => {
-                if (e.target === filterModal) {
-                    filterModal.classList.remove("show");
-                    setTimeout(() => filterModal.remove(), 300);
-                }
-            });
+    // Close modal when clicking outside
+    window.addEventListener('click', (e) => {
+        if (e.target === filterModal) {
+            filterModal.style.display = 'none';
+        }
+    });
 
-            const applyFiltersBtn = filterModal.querySelector("#apply-filters");
-            applyFiltersBtn.addEventListener("click", () => {
-                const selectedCategories = Array.from(filterModal.querySelectorAll(".filter-checkbox:checked"))
-                    .map(checkbox => checkbox.value);
-                const priceMin = parseInt(filterModal.querySelector("#price-min").value) || 0;
-                const priceMax = parseInt(filterModal.querySelector("#price-max").value) || Infinity;
-                const ratingMin = parseInt(filterModal.querySelector("#rating-min").value) || 0;
+    // Apply filters
+    applyBtn.addEventListener('click', () => {
+        // Get filter values
+        const selectedCategories = Array.from(document.querySelectorAll('input[name="category"]:checked'))
+            .map(cb => cb.value);
+        const priceFrom = parseInt(document.getElementById('priceFrom').value) || 0;
+        const priceTo = parseInt(document.getElementById('priceTo').value) || Infinity;
+        const ratingMin = parseInt(document.getElementById('rating').value) || 0;
 
-                filteredSpecialOffers = specialOffers.filter(item => {
-                    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
-                    const matchesPrice = item.price >= priceMin && item.price <= priceMax;
-                    const rating = parseInt(item.rating.match(/\d+/)[0]);
-                    const matchesRating = rating >= ratingMin;
-                    return matchesCategory && matchesPrice && matchesRating;
-                });
-
-                filteredFullMenu = fullMenu.filter(item => {
-                    const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
-                    const matchesPrice = item.price >= priceMin && item.price <= priceMax;
-                    const rating = parseInt(item.rating.match(/\d+/)[0]);
-                    const matchesRating = rating >= ratingMin;
-                    return matchesCategory && matchesPrice && matchesRating;
-                });
-
-                filteredSpecialOffers = applySort(filteredSpecialOffers);
-                filteredFullMenu = applySort(filteredFullMenu);
-                renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
-                renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
-                filterModal.classList.remove("show");
-                setTimeout(() => filterModal.remove(), 300);
-            });
-
-            const resetFiltersBtn = filterModal.querySelector("#reset-filters");
-            resetFiltersBtn.addEventListener("click", () => {
-                filterModal.querySelectorAll(".filter-checkbox").forEach(checkbox => checkbox.checked = false);
-                filterModal.querySelector("#price-min").value = 0;
-                filterModal.querySelector("#price-max").value = 1000;
-                filterModal.querySelector("#rating-min").value = 80;
-                filteredSpecialOffers = [...specialOffers];
-                filteredFullMenu = [...fullMenu];
-                filteredSpecialOffers = applySort(filteredSpecialOffers);
-                filteredFullMenu = applySort(filteredFullMenu);
-                renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
-                renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
-            });
+        // Filter special offers
+        filteredSpecialOffers = specialOffers.filter(item => {
+            const itemRating = parseInt(item.rating.match(/\d+/)[0]);
+            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
+            const matchesPrice = item.price >= priceFrom && item.price <= priceTo;
+            const matchesRating = itemRating >= ratingMin;
+            
+            return matchesCategory && matchesPrice && matchesRating;
         });
-    }
+
+        // Filter full menu
+        filteredFullMenu = fullMenu.filter(item => {
+            const itemRating = parseInt(item.rating.match(/\d+/)[0]);
+            const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(item.category);
+            const matchesPrice = item.price >= priceFrom && item.price <= priceTo;
+            const matchesRating = itemRating >= ratingMin;
+            
+            return matchesCategory && matchesPrice && matchesRating;
+        });
+
+        // Apply current sort
+        const sortSelect = document.getElementById('sort-select');
+        if (sortSelect) {
+            const currentSort = sortSelect.value;
+            filteredSpecialOffers = applySort(filteredSpecialOffers, currentSort);
+            filteredFullMenu = applySort(filteredFullMenu, currentSort);
+        }
+
+        // Re-render menu items
+        renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
+        renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
+        
+        // Close modal
+        filterModal.style.display = 'none';
+    });
+
+    // Reset filters
+    resetBtn.addEventListener('click', () => {
+        // Reset checkboxes
+        document.querySelectorAll('input[name="category"]')
+            .forEach(cb => cb.checked = false);
+        
+        // Reset number inputs
+        document.getElementById('priceFrom').value = '0';
+        document.getElementById('priceTo').value = '1000';
+        document.getElementById('rating').value = '80';
+
+        // Reset filtered items
+        filteredSpecialOffers = [...specialOffers];
+        filteredFullMenu = [...fullMenu];
+
+        // Apply current sort
+        const sortSelect = document.getElementById('sort-select');
+        if (sortSelect) {
+            const currentSort = sortSelect.value;
+            filteredSpecialOffers = applySort(filteredSpecialOffers, currentSort);
+            filteredFullMenu = applySort(filteredFullMenu, currentSort);
+        }
+
+        // Re-render menu items
+        renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
+        renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
+    });
 
     // Initialize sort select
-    const sortSelect = document.getElementById("sort-select");
+    const sortSelect = document.getElementById('sort-select');
     if (sortSelect) {
-        sortSelect.addEventListener("change", () => {
-            currentSortOption = sortSelect.value;
-            filteredSpecialOffers = applySort(filteredSpecialOffers);
-            filteredFullMenu = applySort(filteredFullMenu);
+        sortSelect.addEventListener('change', () => {
+            const currentSort = sortSelect.value;
+            filteredSpecialOffers = applySort(filteredSpecialOffers, currentSort);
+            filteredFullMenu = applySort(filteredFullMenu, currentSort);
+            
             renderMenuItems(filteredSpecialOffers, document.getElementById("special-offers-items"));
             renderMenuItems(filteredFullMenu, document.getElementById("full-menu-items"));
         });
@@ -337,6 +336,9 @@ document.addEventListener('DOMContentLoaded', () => {
             deliveryBtn.classList.remove('active');
         });
     }
+
+    // Update auth section on page load
+    updateAuthSection();
 });
 
 function createMenuItem(item) {
@@ -378,14 +380,14 @@ function getPopularity(item) {
     return parseInt(item.rating.match(/\d+/)[0]); // Отримуємо числове значення рейтингу (відсоток)
 }
 
-function applySort(items) {
-    if (currentSortOption === "price-asc") {
+function applySort(items, sortOption) {
+    if (sortOption === "price-asc") {
         return [...items].sort((a, b) => a.price - b.price);
-    } else if (currentSortOption === "price-desc") {
+    } else if (sortOption === "price-desc") {
         return [...items].sort((a, b) => b.price - a.price);
-    } else if (currentSortOption === "popularity-asc") {
+    } else if (sortOption === "popularity-asc") {
         return [...items].sort((a, b) => getPopularity(a) - getPopularity(b));
-    } else if (currentSortOption === "popularity-desc") {
+    } else if (sortOption === "popularity-desc") {
         return [...items].sort((a, b) => getPopularity(b) - getPopularity(a));
     } else {
         return [...items];
@@ -537,3 +539,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Function to check if user is logged in
+function isUserLoggedIn() {
+    return localStorage.getItem('user') !== null;
+}
+
+// Function to update auth section based on login state
+function updateAuthSection() {
+    const authButtons = document.querySelector('.auth-buttons');
+    if (!authButtons) return;
+
+    if (isUserLoggedIn()) {
+        authButtons.innerHTML = `
+            <a href="profile.html" class="btn">
+                <img src="images/profile.png" alt="Profile" style="width: 24px; height: 24px; filter: brightness(0) invert(1);" />
+            </a>
+        `;
+    } else {
+        authButtons.innerHTML = `
+            <a href="login.html" class="btn">Увійти</a>
+            <a href="register.html" class="btn">Реєстрація</a>
+        `;
+    }
+}

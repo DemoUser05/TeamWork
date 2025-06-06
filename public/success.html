@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Замовлення успішно оплачено</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/orderStyle.css">
+  <style>
+    .success-container {
+      text-align: center;
+      padding: 60px 20px;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .success-icon {
+      width: 120px;
+      height: 120px;
+      background: #FE9A9B;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 30px;
+      animation: scaleIn 0.5s ease-out;
+    }
+
+    .success-icon i {
+      font-size: 60px;
+      color: white;
+    }
+
+    .success-title {
+      color: #333;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      animation: fadeInUp 0.5s ease-out 0.3s both;
+    }
+
+    .success-text {
+      color: #666;
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      animation: fadeInUp 0.5s ease-out 0.5s both;
+    }
+
+    .success-buttons {
+      animation: fadeInUp 0.5s ease-out 0.7s both;
+    }
+
+    .success-buttons .btn {
+      margin: 0 10px;
+      padding: 12px 30px;
+      border-radius: 12px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .success-buttons .btn-primary {
+      background: #FE9A9B;
+      border: none;
+    }
+
+    .success-buttons .btn-primary:hover {
+      background: #ff8182;
+      transform: translateY(-2px);
+    }
+
+    .success-buttons .btn-outline-secondary {
+      border-color: rgba(254, 154, 155, 0.3);
+      color: #333;
+    }
+
+    .success-buttons .btn-outline-secondary:hover {
+      background: rgba(254, 154, 155, 0.1);
+      color: #FE9A9B;
+      border-color: #FE9A9B;
+    }
+
+    @keyframes scaleIn {
+      from {
+        transform: scale(0);
+        opacity: 0;
+      }
+      to {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes fadeInUp {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="success-container">
+      <div class="success-icon">
+        <i class="bi bi-check-lg"></i>
+      </div>
+      <h1 class="success-title">Замовлення успішно оплачено!</h1>
+      <p class="success-text">
+        Дякуємо за ваше замовлення! Ми вже почали його готувати.<br>
+        Ви отримаєте email з деталями замовлення.
+      </p>
+      <div class="success-buttons">
+        <a href="menu.html" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-2"></i>Повернутись до меню
+        </a>
+        <a href="profile.html" class="btn btn-primary">
+          Мої замовлення <i class="bi bi-arrow-right ms-2"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

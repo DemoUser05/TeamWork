@@ -5,61 +5,123 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дрібка Смаку - Меню</title>
     <link rel="stylesheet" href="css/menustyle.css">
+    <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="js/cartService.js"></script>
     <script src="js/menu.js" defer></script>
 </head>
 <body>
     <div class="container">
-        <header class="header">
-            <nav class="nav-bar">
+        <header class="top-header">
+            <div class="left-side">
                 <button class="back-btn">← Назад</button>
-                <div class="nav-items">
-                    <select class="address-select">
-                        <option>Вибрати Місто</option>
-                        <option>Львів</option>
-                        <option>Дрогобич</option>
-                        <option>Черкаси</option>
-                    </select>
-                    <div class="search-container">
-                        <img src="images/leading-icon.png" alt="Search" class="search-icon">
-                        <input type="text" class="search-input" placeholder="Пошук" id="search-input">
-                    </div>
-                    <img src="images/cart.png" alt="Cart" class="cart-icon">
-                    <a href="profile.html" class="btn">
-                        <img src="images/profile.png" alt="Profile" class="profile-icon" />
-                    </a>
-                </div>
-            </nav>
-            <div class="hero-image">
-                <img id="restaurant-image" src="images/default.jpg" alt="Головне фото ресторану">
-                <div class="overlay">
-                    <h1 id="restaurant-title">Завантаження...</h1>
-                    <div class="dose-info">
-                        <span class="rating">4.7 ★ (+1000)</span>
-                        <span class="hours">10:00 до 22:00</span>
-                    </div>
-                </div>
             </div>
-            <div class="delivery-options">
+
+            <div class="right-side">
+                <select id="city-select" class="city-select">
+                    <option value="">Місто</option>
+                    <option value="Дрогобич">Дрогобич</option>
+                    <option value="Львів">Львів</option>
+                    <option value="Черкаси">Черкаси</option>
+                </select>
+
+                <div class="search-container">
+                    <img src="images/leading-icon.png" alt="Search" class="search-icon">
+                    <input type="text" class="search-input" placeholder="Пошук" id="search-input">
+                </div>
+
                 <div class="delivery-toggle">
-                    <button class="delivery active">Доставка</button>
-                    <button class="pickup">Самовивіз</button>
+                    <button class="active">Доставка</button>
+                    <button>Самовивіз</button>
+                </div>
+
+                <a href="order.html" class="cart-link">
+                    <img src="images/cart.png" alt="Cart" class="cart-icon">
+                </a>
+
+                <div id="authSection">
+                    <div class="auth-buttons">
+                        <a href="login.html" class="btn">Увійти</a>
+                        <a href="register.html" class="btn">Реєстрація</a>
+                    </div>
                 </div>
             </div>
         </header>
-        
-        <main class="main-content">
-            <section class="special-offers">
-                <div class="filters">
-                    <button id="filter-btn" class="filter-btn">Фільтр</button>
-                    <select id="sort-select" class="sort-select">
-                        <option value="popularity-desc">За популярністю</option>
-                        <option value="price-asc">Від дешевих до дорогих</option>
-                        <option value="price-desc">Від дорогих до дешевих</option>
-                        <option value="popularity-asc">За рейтингом (за зростанням)</option>
-                    </select>
+
+        <div class="hero-image">
+            <img id="restaurant-image" src="images/default.jpg" alt="Головне фото ресторану">
+            <div class="overlay">
+                <h1 id="restaurant-title">Daily Dose</h1>
+                <div class="dose-info">
+                    <span class="rating">4.7 ★ (+1000)</span>
+                    <span class="hours">10:00 до 22:00</span>
                 </div>
+            </div>
+        </div>
+            
+        <main class="main-content">
+            <div class="filters">
+                <button id="filter-btn" class="filter-btn">Фільтр</button>
+                <select id="sort-select" class="sort-select">
+                    <option value="popularity-desc">За популярністю</option>
+                    <option value="price-asc">Від дешевих до дорогих</option>
+                    <option value="price-desc">Від дорогих до дешевих</option>
+                    <option value="popularity-asc">За рейтингом (за зростанням)</option>
+                </select>
+            </div>
+
+            <!-- Filter Modal -->
+            <div id="filterModal" class="modal">
+                <div class="modal-content">
+                    <h2>Фільтри</h2>
+                    <div class="filter-section">
+                        <h3>Категорія</h3>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" name="category" value="М'ясо"> М'ясо
+                            </label>
+                            <label>
+                                <input type="checkbox" name="category" value="Десерти"> Десерти
+                            </label>
+                            <label>
+                                <input type="checkbox" name="category" value="Фастфуд"> Фастфуд
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3>Діапазон цін</h3>
+                        <div class="price-range">
+                            <div class="price-input">
+                                <label>Від:</label>
+                                <input type="number" id="priceFrom" min="0" value="0">
+                            </div>
+                            <div class="price-input">
+                                <label>До:</label>
+                                <input type="number" id="priceTo" min="0" value="1000">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-section">
+                        <h3>Рейтинг</h3>
+                        <div class="rating-input">
+                            <label>Вище:</label>
+                            <div class="rating-wrapper">
+                                <input type="number" id="rating" min="0" max="100" value="80">
+                                <span>%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-actions">
+                        <button class="apply-btn">Застосувати</button>
+                        <button class="reset-btn">Скинути</button>
+                    </div>
+                </div>
+            </div>
+
+            <section class="special-offers">
                 <h2>Найкращі пропозиції</h2>
                 <div class="menu-items" id="special-offers-items">
                 </div>
@@ -72,5 +134,65 @@
             </section>
         </main>
     </div>
+
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js';
+
+        function updateUserProfile(user, userData) {
+            const authSection = document.getElementById('authSection');
+            
+            if (user) {
+                const name = userData.name || user.displayName || '';
+                const firstLetter = name ? name.charAt(0).toUpperCase() : (user.email ? user.email.charAt(0).toUpperCase() : 'U');
+                
+                authSection.innerHTML = `
+                    <a href="profile.html" class="profile-link">
+                        <div class="profile-icon">${firstLetter}</div>
+                    </a>
+                `;
+            } else {
+                authSection.innerHTML = `
+                    <div class="auth-buttons">
+                        <a href="login.html" class="btn">Увійти</a>
+                        <a href="register.html" class="btn">Реєстрація</a>
+                    </div>
+                `;
+            }
+        }
+
+        function checkAuthState() {
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    const authSection = document.getElementById('authSection');
+                    authSection.innerHTML = `
+                        <div class="auth-buttons">
+                            <a href="login.html" class="btn">Увійти</a>
+                            <a href="register.html" class="btn">Реєстрація</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                try {
+                    const userRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(userRef);
+                    
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        updateUserProfile(user, userData);
+                    } else {
+                        updateUserProfile(user, {});
+                    }
+                } catch (error) {
+                    console.error("Помилка завантаження даних користувача:", error);
+                    updateUserProfile(user, {});
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAuthState);
+    </script>
 </body>
 </html>

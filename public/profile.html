@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Назяд - Профіль</title>
+  <title>Профіль - Дрібка Смаку</title>
   <link rel="stylesheet" href="css/profile.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
@@ -11,11 +11,12 @@
   <!-- Верхній футер -->
   <div class="top-header">
     <div class="header-left">
-      <a href="javascript:history.back()" class="back-btn" id="backBtn">←</a>
-      <a href="javascript:history.back()" class="logo">Назад</a>
+      <a href="index.html" class="back-btn" id="backBtn">←</a>
     </div>
     <div class="header-icons">
-      <a href="#" id="cartBtn"><i class="fas fa-shopping-cart"></i></a>
+      <a href="order.html" id="cartBtn">
+        <img src="images/cart.png" alt="Cart" class="cart-icon">
+      </a>
       <a href="#" id="notificationsBtn"><i class="fas fa-bell"></i></a>
       <div class="avatar-small" id="profileBtn"></div>
     </div>
@@ -30,7 +31,9 @@
 
       <div class="profile-content">
         <div class="avatar-large"></div>
-        <button class="edit-profile-btn" id="editProfileBtn">Редагувати</button>
+        <button class="edit-profile-btn" id="editProfileBtn">
+          <i class="fas fa-edit"></i> Редагувати
+        </button>
         <div id="user-info" class="user-info">
           <span class="info-row"><strong>Телефон:</strong> <span id="phoneValue">Не вказано</span></span>
           <span class="info-row"><strong>Email:</strong> <span id="emailValue">Не вказано</span></span>
@@ -40,27 +43,27 @@
 
       <ul class="menu-list">
         <li class="menu-item" id="subscriptionsBtn">
-          <i class="fas fa-crown menu-icon"></i>
+          <i class="fas fa-crown"></i>
           <span>Підписки</span>
           <i class="fas fa-chevron-right"></i>
         </li>
         <li class="menu-item" id="promoCodeBtn">
-          <i class="fas fa-tag menu-icon"></i>
+          <i class="fas fa-tag"></i>
           <span>Промо код</span>
           <i class="fas fa-chevron-right"></i>
         </li>
         <li class="menu-item" id="ordersBtn">
-          <i class="fas fa-history menu-icon"></i>
+          <i class="fas fa-history"></i>
           <span>Замовлення</span>
           <i class="fas fa-chevron-right"></i>
         </li>
         <li class="menu-item" id="walletsBtn">
-          <i class="fas fa-wallet menu-icon"></i>
+          <i class="fas fa-wallet"></i>
           <span>Ваші гаманці</span>
           <i class="fas fa-chevron-right"></i>
         </li>
         <li class="menu-item" id="favoritesBtn">
-          <i class="fas fa-heart menu-icon"></i>
+          <i class="fas fa-heart"></i>
           <span>Улюблені страви</span>
           <i class="fas fa-chevron-right"></i>
         </li>
@@ -97,12 +100,22 @@
 
   <div class="modal" id="subscriptionsModal">
     <div class="modal-content">
-      <span class="close-btn" id="closeSubscriptionsModal">&times;</span>
       <h2>Підписки</h2>
       <p class="modal-description">Оберіть підписку, яка найкраще підходить для вас</p>
-      <div class="modal-list" id="subscriptionsList">
+      <div class="subscription-plans" id="subscriptionsList">
         <!-- Will be populated by JS -->
       </div>
+    </div>
+  </div>
+
+  <div class="modal" id="promoCodeModal">
+    <div class="modal-content">
+      <span class="close-btn" id="closePromoModal">&times;</span>
+      <h2>Ваш промо код</h2>
+      <div class="promo-code-display" id="promoCodeDisplay"></div>
+      <button id="copyPromoBtn" class="save-btn">
+        <i class="fas fa-copy"></i> Скопіювати код
+      </button>
     </div>
   </div>
 
@@ -116,18 +129,6 @@
     </div>
   </div>
 
-  <div class="modal" id="walletsModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeWalletsModal">&times;</span>
-      <h2>Ваші гаманці</h2>
-      <div class="modal-list" id="walletsList">
-        <!-- Will be populated by JS -->
-      </div>
-      <button id="addWalletBtn" class="save-btn" style="width: 100%; margin-top: 10px;">Додати гаманець</button>
-      <button class="save-btn" style="width: 100%; margin-top: 10px;">Поповнити баланс</button>
-    </div>
-  </div>
-
   <div class="modal" id="favoritesModal">
     <div class="modal-content">
       <span class="close-btn" id="closeFavoritesModal">&times;</span>
@@ -135,63 +136,15 @@
       <div class="modal-list" id="favoritesList">
         <!-- Will be populated by JS -->
       </div>
-      <button id="addFavoriteBtn" class="save-btn" style="width: 100%; margin-top: 20px;">Додати страву</button>
     </div>
   </div>
 
-  <div class="modal" id="promoCodeModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closePromoModal">&times;</span>
-      <h2>Ваш промо код</h2>
-      <div class="promo-code-display" id="promoCodeDisplay">NAZ2024</div>
-      <button class="save-btn" style="width: 100%;" id="copyPromoBtn">Копіювати код</button>
-    </div>
-  </div>
-
-  <!-- Add Wallet Modal -->
-  <div class="modal" id="addWalletModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeAddWalletModal">&times;</span>
-      <h2>Додати гаманець</h2>
-      <form id="walletForm">
-        <div class="form-group">
-          <label for="walletName">Назва гаманця</label>
-          <input type="text" id="walletName" required>
-        </div>
-        <div class="form-group">
-          <label for="walletBalance">Початковий баланс</label>
-          <input type="number" id="walletBalance" min="0" step="0.01" value="0">
-        </div>
-        <div class="form-group">
-          <input type="checkbox" id="walletPrimary">
-          <label for="walletPrimary">Основний гаманець</label>
-        </div>
-        <button type="submit" class="save-btn">Зберегти</button>
-      </form>
-    </div>
-  </div>
-
-  <!-- Add Favorite Modal -->
-  <div class="modal" id="addFavoriteModal">
-    <div class="modal-content">
-      <span class="close-btn" id="closeAddFavoriteModal">&times;</span>
-      <h2>Додати улюблену страву</h2>
-      <form id="favoriteForm">
-        <div class="form-group">
-          <label for="favoriteName">Назва страви</label>
-          <input type="text" id="favoriteName" required>
-        </div>
-        <div class="form-group">
-          <label for="favoriteCategory">Категорія</label>
-          <input type="text" id="favoriteCategory">
-        </div>
-        <button type="submit" class="save-btn">Додати</button>
-      </form>
-    </div>
-  </div>
-
-  <script type="module" src="firebase-config.js"></script>
+  <!-- Firebase Scripts -->
+  <script type="module">
+    import { auth, db } from './firebase-config.js';
+    window.auth = auth;
+    window.db = db;
+  </script>
   <script type="module" src="js/profile.js"></script>
-
 </body>
 </html>

@@ -123,6 +123,7 @@ function updateSummary() {
   // Отримуємо страви з CartService
   const items = cartService.cart || [];
   let subtotal = cartService.getTotal();
+  const originalSubtotal = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
   // Перевіряємо тип доставки
   const isDelivery = document.getElementById('deliveryBtn').classList.contains('btn-dark');
@@ -159,55 +160,48 @@ function updateSummary() {
     return;
   }
 
-  // Відображаємо кожну страву
-  items.forEach(item => {
-    const li = document.createElement("li");
-    li.className = "list-group-item d-flex justify-content-between";
-    
-    // Базова інформація
-    let itemText = `${item.name} x ${item.quantity}`;
-    
-    // Додаємо інформацію про додаткові опції
-    if (item.extras && item.extras.length > 0) {
-      itemText += '<br>' + item.extras.map(extra => 
-        `<small class="text-muted">+ ${extra.name}</small>`
-      ).join('<br>');
-    }
-    
-    li.innerHTML = `<span class="item-name">${itemText}</span>`;
-    const span = document.createElement("span");
-    span.className = "item-price";
-    span.textContent = `${item.totalPrice} грн`;
-    li.appendChild(span);
-    list.appendChild(li);
-  });
+  // Показуємо суму замовлення
+  list.innerHTML = `
+    <li class="list-group-item d-flex justify-content-between">
+      <span class="item-name">Сума замовлення</span>
+      <span class="item-price">${originalSubtotal.toFixed(2)} грн</span>
+    </li>`;
 
-  // Робота кур'єра
-  const deliveryFee = subtotal >= 800 ? 0 : 60;
-  
-  if (isDelivery) {
-    const delivery = document.createElement("li");
-    delivery.className = "list-group-item d-flex justify-content-between";
-    delivery.innerHTML = deliveryFee === 0
-      ? `<span class="item-name service-fee">Робота кур'єра</span> <span><span class="crossed-price">60 грн</span> <span class="free-text">Безкоштовно</span></span>`
-      : `<span class="item-name service-fee">Робота кур'єра</span> <span class="item-price">${deliveryFee} грн</span>`;
-    list.appendChild(delivery);
-    subtotal += deliveryFee;
+  // Показуємо знижку по промокоду, якщо він активований
+  if (cartService.isPromoApplied()) {
+    const discount = originalSubtotal * 0.1;
+    list.innerHTML += `
+      <li class="list-group-item d-flex justify-content-between text-success">
+        <span class="item-name">Знижка по промокоду (10%)</span>
+        <span class="item-price">-${discount.toFixed(2)} грн</span>
+      </li>`;
   }
 
-  // Сервісний збір
-  const serviceFee = 20;
-  const service = document.createElement("li");
-  service.className = "list-group-item d-flex justify-content-between";
-  service.innerHTML = `<span class="item-name service-fee">Сервісний збір</span> <span class="item-price">${serviceFee} грн</span>`;
-  list.appendChild(service);
-  subtotal += serviceFee;
+  // Показуємо вартість доставки, якщо вона є
+  if (isDelivery) {
+    const deliveryCost = originalSubtotal < 500 ? 60 : 0;
+    list.innerHTML += `
+      <li class="list-group-item d-flex justify-content-between">
+        <span class="item-name service-fee">Робота кур'єра${originalSubtotal >= 500 ? ' (безкоштовно)' : ''}</span>
+        <span class="item-price">${deliveryCost} грн</span>
+      </li>`;
+    subtotal += deliveryCost;
+  }
 
-  // Разом
-  const totalItem = document.createElement("li");
-  totalItem.className = "list-group-item d-flex justify-content-between fw-bold";
-  totalItem.innerHTML = `<span class="item-name">Разом</span> <span class="item-price">${subtotal} грн</span>`;
-  list.appendChild(totalItem);
+  // Додаємо сервісний збір
+  list.innerHTML += `
+    <li class="list-group-item d-flex justify-content-between">
+      <span class="item-name service-fee">Сервісний збір</span>
+      <span class="item-price">20 грн</span>
+    </li>`;
+  subtotal += 20;
+
+  // Показуємо загальну суму
+  list.innerHTML += `
+    <li class="list-group-item d-flex justify-content-between fw-bold">
+      <span class="item-name">Разом</span>
+      <span class="item-price">${subtotal.toFixed(2)} грн</span>
+    </li>`;
 
   updatePaymentButtonState();
 }
@@ -221,15 +215,19 @@ function updatePaymentButtonState() {
 }
 
 function applyPromo() {
-  const code = document.getElementById("promo").value.trim().toLowerCase();
-  if (code === "daily dose") {
-    discount = 50;
-    gsap.to("#promo", { backgroundColor: "#c2f0c2", duration: 0.5 });
+  const promoInput = document.getElementById("promo");
+  const code = promoInput.value.trim();
+  
+  if (cartService.applyPromoCode(code)) {
+    promoInput.style.backgroundColor = "#c2f0c2";
+    updateSummary();
   } else {
-    discount = 0;
-    gsap.to("#promo", { backgroundColor: "#f5c2c2", duration: 0.5 });
+    promoInput.style.backgroundColor = "#f5c2c2";
+    cartService.showNotification('Недійсний промокод');
+    setTimeout(() => {
+      promoInput.style.backgroundColor = "";
+    }, 2000);
   }
-  updateSummary();
 }
 
 function toggleEdit(id) {
@@ -633,90 +631,51 @@ function showSuccessMessage(message) {
 }
 
 function handlePayment() {
-  // Отримуємо страви з CartService
-  const items = cartService.cart;
+  // Перевіряємо, чи вибрана оплата карткою
+  const cardPaymentSelected = document.getElementById('pay2').checked;
   
-  // Перевіряємо чи є страви в кошику
-  if (items.length === 0) {
-    showErrorMessage('Кошик порожній');
+  if (cardPaymentSelected) {
+    // Зберігаємо дані замовлення в localStorage
+    const orderData = {
+      items: cartService.cart,
+      address: currentAddress,
+      phone: document.getElementById('phone').value,
+      comments: {
+        courier: document.getElementById('courier-comment')?.value || '',
+        general: document.getElementById('general-comment')?.value || ''
+      }
+    };
+    localStorage.setItem('orderData', JSON.stringify(orderData));
+    
+    // Перенаправляємо на сторінку оплати
+    window.location.href = 'payment.html';
     return;
   }
 
-  // Перевіряємо чи вибрано спосіб доставки
-  const isDelivery = document.getElementById('deliveryBtn').classList.contains('btn-dark');
-  const isPickup = document.getElementById('pickupBtn').classList.contains('btn-dark');
-
-  if (!isDelivery && !isPickup) {
-    showErrorMessage('Оберіть спосіб доставки');
-    return;
-  }
-
-  // Якщо вибрана доставка, перевіряємо адресу
-  if (isDelivery) {
-    if (!currentAddress.city || !currentAddress.street) {
-      showErrorMessage('Вкажіть адресу доставки');
-      return;
-    }
-  }
-
-  // Якщо вибраний самовивіз, перевіряємо ресторан
-  if (isPickup) {
-    const restaurant = document.getElementById('restaurantSelect').value;
-    if (!restaurant) {
-      showErrorMessage('Оберіть ресторан');
-      return;
-    }
-
-    // Перевіряємо час самовивозу
-    const pickupTime = document.getElementById('pickupTime').value;
-    if (!pickupTime) {
-      showErrorMessage('Оберіть час самовивозу');
-      return;
-    }
-
-    // Перевіряємо чи вибраний час не в минулому
-    const [hours, minutes] = pickupTime.split(':').map(Number);
-    const currentTime = new Date();
-    const selectedTime = new Date();
-    selectedTime.setHours(hours, minutes, 0);
-
-    if (selectedTime < currentTime) {
-      showErrorMessage('Час самовивозу не може бути в минулому');
-      return;
-    }
-  }
-
-    // Перевіряємо номер телефону
-    const phoneInput = document.getElementById('phone');
-    if (!phoneInput.value || !validatePhoneNumber(phoneInput.value)) {
-      showErrorMessage('Будь ласка, введіть коректний номер телефону');
-      return;
-    }
-  
-  // Показуємо повідомлення про підтвердження замовлення
+  // Для інших способів оплати - існуюча логіка
   const paymentBtn = document.querySelector('.payment-btn');
-  if (paymentBtn) {
-    paymentBtn.innerHTML = '<i class="bi bi-check-lg"></i> Замовлення прийнято';
-    paymentBtn.classList.add('btn-success');
-    paymentBtn.disabled = true;
+  if (paymentBtn.disabled) return;
 
-    // Очищаємо кошик
-    cartService.clearCart();
+  // Показуємо анімацію завантаження
+  paymentBtn.disabled = true;
+  paymentBtn.innerHTML = `
+    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+    Обробка замовлення...
+  `;
 
-    // Показуємо повідомлення про зв'язок з менеджером
-    showSuccessMessage('Дякуємо за замовлення! Наш менеджер зв\'яжеться з вами найближчим часом для підтвердження.');
-
-    // Затримка перед перенаправленням
+  // Імітуємо обробку замовлення
+  setTimeout(() => {
+    // Очищаємо кошик і скидаємо промокод
+    cartService.handlePaymentComplete();
+    
+    // Показуємо повідомлення про успіх
+    showSuccessMessage('Замовлення успішно оформлено!');
+    
+    // Перенаправляємо на головну сторінку
     setTimeout(() => {
-      gsap.to(".container", {
-        opacity: 0,
-        duration: 0.5,
-        onComplete: () => {
-          window.location.href = 'index.html';
-        }
-      });
-    }, 3000);
-  }
+      window.location.href = 'index.html';
+    }, 2000);
+  }, 2000);
 }
 
 function showErrorMessage(message) {

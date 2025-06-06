@@ -8,7 +8,7 @@
 html, body {
   height: 100%;
   overflow: hidden;
-  background-color: #f5f5f5;
+  background: linear-gradient(185deg, #eeeeee 50%, #ff8182 50%);
   display: flex;
   justify-content: center;
   align-items: center;

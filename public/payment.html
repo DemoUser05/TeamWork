@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Оплата замовлення</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/orderStyle.css">
+  <link rel="stylesheet" href="css/paymentStyle.css">
+</head>
+<body>
+  <div class="container-fluid bg-pink py-2 text-start px-3">
+    <button class="btn btn-light" onclick="history.back()"><i class="bi bi-arrow-left"></i> Назад</button>
+  </div>
+
+  <div class="container mt-3">
+    <div class="row g-3">
+      <!-- Ліва колонка - форма оплати -->
+      <div class="col-md-6">
+        <div class="card-custom bg-purple">
+          <h5 class="text-dark mb-4">Оплата карткою</h5>
+          
+          <form id="payment-form">
+            <!-- Номер карти -->
+            <div class="form-group mb-4">
+              <label class="form-label">Номер карти</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="card-number" placeholder="1234 5678 9012 3456" maxlength="19">
+                <span class="input-group-text">
+                  <i class="bi bi-credit-card"></i>
+                </span>
+              </div>
+            </div>
+
+            <div class="row g-3 mb-4">
+              <!-- Термін дії -->
+              <div class="col-6">
+                <label class="form-label">Термін дії</label>
+                <div class="input-group">
+                  <input type="text" class="form-control" id="expiry" placeholder="MM/РР" maxlength="5">
+                  <span class="input-group-text">
+                    <i class="bi bi-calendar"></i>
+                  </span>
+                </div>
+              </div>
+
+              <!-- CVV код -->
+              <div class="col-6">
+                <label class="form-label">CVV код</label>
+                <div class="input-group">
+                  <input type="password" class="form-control" id="cvv" placeholder="123" maxlength="3">
+                  <span class="input-group-text">
+                    <i class="bi bi-lock"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ім'я на карті -->
+            <div class="form-group mb-4">
+              <label class="form-label">Ім'я на карті</label>
+              <div class="input-group">
+                <input type="text" class="form-control" id="card-name" placeholder="YURII PROKOPIV">
+                <span class="input-group-text">
+                  <i class="bi bi-person"></i>
+                </span>
+              </div>
+            </div>
+
+            <button type="submit" class="payment-btn w-100">
+              Оплатити <span id="payment-amount"></span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="card-custom bg-purple mb-3">
+          <h5 class="text-dark">Ваше замовлення</h5>
+          <div id="order-items">
+          </div>
+        </div>
+
+        <div class="card-custom bg-purple">
+          <h5 class="text-dark">Сума до сплати</h5>
+          <ul class="list-group mb-3" id="summary">
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script src="js/cartService.js"></script>
+
+  <script src="js/paymentScript.js"></script>
+</body>
+</html> 
