@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Про нас - Дрібка Смаку</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-bar">
+            <button class="back-btn" onclick="window.location.href='index.html'">← Назад</button>
+            <div class="nav-items">
+            
+                <a href="order.html" class="cart-link">
+                    <img src="images/cart.png" alt="Кошик" class="cart-icon">
+                </a>
+                <div id="authSection">
+                    <div class="auth-buttons">
+                        <a href="login.html" class="btn">Увійти</a>
+                        <a href="register.html" class="btn">Реєстрація</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="about-content">
+            <div class="about-hero">
+                <h1>Про нас</h1>
+                <p class="subtitle">Ваш надійний партнер у світі доставки їжі</p>
+            </div>
+
+            <section class="about-section">
+                <h2>Наша історія</h2>
+                <p>Дрібка Смаку - це інноваційний сервіс доставки їжі, який розпочав свою роботу у 2025 році. Ми об'єднали найкращі ресторани та заклади харчування, щоб забезпечити нашим клієнтам широкий вибір смачних страв з доставкою додому.</p>
+            </section>
+
+            <section class="about-section">
+                <h2>Наша місія</h2>
+                <p>Ми прагнемо зробити процес замовлення їжі максимально простим та приємним, забезпечуючи швидку доставку та високу якість обслуговування.</p>
+            </section>
+
+            <section class="about-section advantages">
+                <h2>Наші переваги</h2>
+                <div class="advantages-grid">
+                    <div class="advantage-card">
+                  
+                        <h3>Швидка доставка</h3>
+                        <p>Доставляємо замовлення протягом 30-60 хвилин</p>
+                    </div>
+                    <div class="advantage-card">
+               
+                        <h3>Висока якість</h3>
+                        <p>Співпрацюємо тільки з перевіреними закладами</p>
+                    </div>
+                    <div class="advantage-card">
+                       
+                        <h3>Надійна підтримка</h3>
+                        <p>Наша служба підтримки працює 24/7</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="about-section">
+                <h2>Як ми працюємо</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Оберіть ресторан</h3>
+                        <p>Виберіть улюблений заклад з нашого каталогу</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Зробіть замовлення</h3>
+                        <p>Додайте страви до кошика та оформіть замовлення</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Отримайте доставку</h3>
+                        <p>Ми доставимо ваше замовлення швидко та безпечно</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js';
+
+        function updateUserProfile(user, userData) {
+            const authSection = document.getElementById('authSection');
+            const photoURL = userData.photoURL || user.photoURL || 'images/profile.png';
+            
+            authSection.innerHTML = `
+                <a href="profile.html" class="profile-link">
+                    <img src="${photoURL}" alt="Profile" class="profile-icon" title="${user.displayName || user.email}" />
+                </a>
+            `;
+        }
+
+        function checkAuthState() {
+            onAuthStateChanged(auth, async (user) => {
+                const authSection = document.getElementById('authSection');
+                
+                if (!user) {
+                    authSection.innerHTML = `
+                        <div class="auth-buttons">
+                            <a href="login.html" class="btn btn-outline">Увійти</a>
+                            <a href="register.html" class="btn">Реєстрація</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                try {
+                    const userRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(userRef);
+                    
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        updateUserProfile(user, userData);
+                    } else {
+                        updateUserProfile(user, {});
+                    }
+                } catch (error) {
+                    console.error("Помилка завантаження даних користувача:", error);
+                    updateUserProfile(user, {});
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAuthState);
+    </script>
+</body>
+</html> 

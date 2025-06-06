@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>БАШУ DOSE - Меню</title>
+    <title>Дрібка Смаку - Меню</title>
     <link rel="stylesheet" href="css/menustyle.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="js/cartService.js"></script>
     <script src="js/menu.js" defer></script>
 </head>
 <body>
     <div class="container">
         <header class="header">
             <nav class="nav-bar">
-                <div class="menu-icon">☰</div>
+                <button class="back-btn">← Назад</button>
                 <div class="nav-items">
                     <select class="address-select">
                         <option>Вибрати Місто</option>
@@ -31,28 +32,32 @@
                 </div>
             </nav>
             <div class="hero-image">
+                <img id="restaurant-image" src="images/default.jpg" alt="Головне фото ресторану">
                 <div class="overlay">
-                    <h1 class="logo">DAILY DOSE</h1>
+                    <h1 id="restaurant-title">Завантаження...</h1>
                     <div class="dose-info">
                         <span class="rating">4.7 ★ (+1000)</span>
-                        <span class="hours">3 10:00 до 22:00</span>
+                        <span class="hours">10:00 до 22:00</span>
                     </div>
                 </div>
             </div>
             <div class="delivery-options">
-                <span class="delivery active">Доставка</span>
-                <span class="pickup">Самовивіз</span>
+                <div class="delivery-toggle">
+                    <button class="delivery active">Доставка</button>
+                    <button class="pickup">Самовивіз</button>
+                </div>
             </div>
         </header>
         
         <main class="main-content">
             <section class="special-offers">
                 <div class="filters">
-                    <button class="filter-btn" id="filter-btn">Фільтр</button>
-                    <select class="sort-select" id="sort-select">
-                        <option value="popularity">Сортувати за популярністю</option>
-                        <option value="price-asc">Сортувати за ціною: від низької до високої</option>
-                        <option value="price-desc">Сортувати за ціною: від високої до низької</option>
+                    <button id="filter-btn" class="filter-btn">Фільтр</button>
+                    <select id="sort-select" class="sort-select">
+                        <option value="popularity-desc">За популярністю</option>
+                        <option value="price-asc">Від дешевих до дорогих</option>
+                        <option value="price-desc">Від дорогих до дешевих</option>
+                        <option value="popularity-asc">За рейтингом (за зростанням)</option>
                     </select>
                 </div>
                 <h2>Найкращі пропозиції</h2>
@@ -69,4 +74,3 @@
     </div>
 </body>
 </html>
-

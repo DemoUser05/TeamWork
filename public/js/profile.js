@@ -5,7 +5,7 @@ import {
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  doc, getDoc, updateDoc, collection, getDocs, query, where, addDoc, deleteDoc
+  doc, getDoc, updateDoc, collection, getDocs, query, where, addDoc, deleteDoc, setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const auth = window.auth;
@@ -57,13 +57,109 @@ const elements = {
   nameValue: document.getElementById('nameValue')
 };
 
+// Subscription plans
+const SUBSCRIPTION_PLANS = {
+  basic: {
+    id: 'basic',
+    name: 'Базова підписка',
+    price: 100,
+    description: 'Базовий план з основними перевагами',
+    benefits: [
+      '✓ Безкоштовна доставка',
+      '✓ Знижка 5% на всі доставки',
+      '✓ Доступ до спеціальних акцій'
+    ]
+  },
+  premium: {
+    id: 'premium',
+    name: 'Розширена підписка',
+    price: 250,
+    description: 'Преміум план з додатковими перевагами',
+    benefits: [
+      '✓ Безкоштовна доставка',
+      '✓ Знижка 10% на всі доставки',
+      '✓ Пріоритетна доставка',
+      '✓ Ексклюзивні страви'
+    ]
+  }
+};
+
+const SUBSCRIPTION_DURATIONS = [
+  { months: 1, name: '1 місяць', multiplier: 1 },
+  { months: 3, name: '3 місяці', multiplier: 2.8 },
+  { months: 6, name: '6 місяців', multiplier: 5.5 },
+  { months: 12, name: '12 місяців', multiplier: 10 }
+];
+
 // Initialize the page
 function init() {
+  createModals();
   setupEventListeners();
   checkAuthState();
 }
 
-// Set up all event listeners
+// Create necessary modals
+function createModals() {
+  // Create add wallet modal if it doesn't exist
+  if (!elements.addWalletModal) {
+    const modalDiv = document.createElement('div');
+    modalDiv.id = 'addWalletModal';
+    modalDiv.className = 'modal';
+    document.body.appendChild(modalDiv);
+    elements.addWalletModal = modalDiv;
+  }
+
+  // Create wallets modal if it doesn't exist
+  if (!elements.walletsModal) {
+    const modalDiv = document.createElement('div');
+    modalDiv.id = 'walletsModal';
+    modalDiv.className = 'modal';
+    document.body.appendChild(modalDiv);
+    elements.walletsModal = modalDiv;
+  }
+
+  // Set up wallets modal content
+  elements.walletsModal.innerHTML = `
+    <div class="modal-content">
+      <span class="close-btn" id="closeWalletsModal">&times;</span>
+      <h2>Ваші гаманці</h2>
+      <div class="modal-list" id="walletsList">
+        <!-- Will be populated by JS -->
+      </div>
+      <button id="addWalletBtn" class="save-btn" style="width: 100%; margin-top: 10px;">
+        <i class="fas fa-plus"></i> Додати гаманець
+      </button>
+    </div>
+  `;
+
+  // Set up add wallet modal content
+  elements.addWalletModal.innerHTML = `
+    <div class="modal-content">
+      <span class="close-btn" id="closeAddWalletModal">&times;</span>
+      <h2>Додати гаманець</h2>
+      <form id="walletForm">
+        <div class="form-group">
+          <label for="walletName">Назва гаманця</label>
+          <input type="text" id="walletName" required>
+        </div>
+        <div class="form-group">
+          <label for="walletBalance">Початковий баланс</label>
+          <input type="number" id="walletBalance" min="0" step="0.01" required>
+        </div>
+        <button type="submit" class="save-btn">Додати гаманець</button>
+      </form>
+    </div>
+  `;
+
+  // Update elements after creating modals
+  elements.walletsList = document.getElementById('walletsList');
+  elements.addWalletBtn = document.getElementById('addWalletBtn');
+  elements.closeWalletsModal = document.getElementById('closeWalletsModal');
+  elements.closeAddWalletModal = document.getElementById('closeAddWalletModal');
+  elements.walletForm = document.getElementById('walletForm');
+}
+
+// Set up event listeners
 function setupEventListeners() {
   // Navigation buttons
   elements.backBtn.addEventListener('click', () => window.history.back());
@@ -105,16 +201,11 @@ function setupEventListeners() {
   elements.addWalletBtn.addEventListener('click', () => showModal(elements.addWalletModal));
   elements.closeAddWalletModal.addEventListener('click', () => hideModal(elements.addWalletModal));
   elements.walletForm.addEventListener('submit', handleAddWallet);
-
-  // Favorites management
-  elements.addFavoriteBtn.addEventListener('click', () => showModal(elements.addFavoriteModal));
-  elements.closeAddFavoriteModal.addEventListener('click', () => hideModal(elements.addFavoriteModal));
-  elements.favoriteForm.addEventListener('submit', handleAddFavorite);
+  elements.closeWalletsModal.addEventListener('click', () => hideModal(elements.walletsModal));
 
   // Close buttons
   elements.closeSubscriptionsModal.addEventListener('click', () => hideModal(elements.subscriptionsModal));
   elements.closeOrdersModal.addEventListener('click', () => hideModal(elements.ordersModal));
-  elements.closeWalletsModal.addEventListener('click', () => hideModal(elements.walletsModal));
   elements.closeFavoritesModal.addEventListener('click', () => hideModal(elements.favoritesModal));
   elements.closePromoModal.addEventListener('click', () => hideModal(elements.promoCodeModal));
   
@@ -211,18 +302,35 @@ async function loadSubscriptions() {
     const user = auth.currentUser;
     if (!user) return;
 
-    const q = query(collection(db, "subscriptions"), where("userEmail", "==", user.email));
-    const querySnapshot = await getDocs(q);
-    
-    const subscriptions = querySnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const activeSubQuery = query(
+      collection(db, "subscriptions"),
+      where("userId", "==", user.uid),
+      where("active", "==", true)
+    );
 
-    renderSubscriptions(subscriptions);
+    const activeSubSnapshot = await getDocs(activeSubQuery);
+    let activeSub = null;
+
+    if (!activeSubSnapshot.empty) {
+      activeSub = {
+        id: activeSubSnapshot.docs[0].id,
+        ...activeSubSnapshot.docs[0].data()
+      };
+
+      // Convert Firestore Timestamp to Date
+      if (activeSub.expiryDate && typeof activeSub.expiryDate.toDate === 'function') {
+        activeSub.expiryDate = activeSub.expiryDate.toDate();
+      }
+    }
+
+    window.activeSubscription = activeSub;
+    renderSubscriptions(activeSub ? [activeSub] : []);
+    updateSubscriptionBadge();
   } catch (error) {
     console.error("Error loading subscriptions:", error);
+    window.activeSubscription = null;
     renderSubscriptions([]);
+    updateSubscriptionBadge();
   }
 }
 
@@ -289,125 +397,54 @@ async function loadFavorites() {
   }
 }
 
-// Handle adding a new wallet
-async function handleAddWallet(e) {
-  e.preventDefault();
-  
-  const name = document.getElementById('walletName').value.trim();
-  const balance = parseFloat(document.getElementById('walletBalance').value) || 0;
-  const isPrimary = document.getElementById('walletPrimary').checked;
-  
-  if (!name) {
-    alert("Будь ласка, введіть назву гаманця");
-    return;
-  }
-
-  try {
-    const user = auth.currentUser;
-    if (!user) return;
-    
-    const walletData = {
-      name,
-      balance,
-      isPrimary,
-      userEmail: user.email,
-      userId: user.uid,
-      createdAt: new Date()
-    };
-    
-    // Add to Firestore
-    await addDoc(collection(db, "wallets"), walletData);
-    
-    // Reload wallets
-    await loadWallets();
-    hideModal(elements.addWalletModal);
-    showToast("Гаманець успішно додано!");
-    elements.walletForm.reset();
-  } catch (error) {
-    console.error("Error adding wallet:", error);
-    alert(`Помилка додавання гаманця: ${error.message}`);
-  }
-}
-
-// Handle adding a new favorite dish
-async function handleAddFavorite(e) {
-  e.preventDefault();
-  
-  const dishName = document.getElementById('favoriteName').value.trim();
-  const dishCategory = document.getElementById('favoriteCategory').value.trim();
-  
-  if (!dishName) {
-    alert("Будь ласка, введіть назву страви");
-    return;
-  }
-
-  try {
-    const user = auth.currentUser;
-    if (!user) return;
-    
-    const favoriteData = {
-      dishName,
-      dishCategory,
-      userEmail: user.email,
-      userId: user.uid,
-      createdAt: new Date()
-    };
-    
-    // Add to Firestore
-    await addDoc(collection(db, "favorites"), favoriteData);
-    
-    // Reload favorites
-    await loadFavorites();
-    hideModal(elements.addFavoriteModal);
-    showToast("Страва додана до улюблених!");
-    elements.favoriteForm.reset();
-  } catch (error) {
-    console.error("Error adding favorite:", error);
-    alert(`Помилка додавання страви: ${error.message}`);
-  }
-}
-
-// Delete wallet function
-async function deleteWallet(walletId) {
-  if (!confirm("Ви впевнені, що хочете видалити цей гаманець?")) return;
-  
-  try {
-    await deleteDoc(doc(db, "wallets", walletId));
-    await loadWallets();
-    showToast("Гаманець видалено!");
-  } catch (error) {
-    console.error("Error deleting wallet:", error);
-    alert("Помилка видалення гаманця");
-  }
-}
-
-// Delete favorite function
-async function deleteFavorite(favoriteId) {
-  if (!confirm("Видалити цю страву з улюблених?")) return;
-  
-  try {
-    await deleteDoc(doc(db, "favorites", favoriteId));
-    await loadFavorites();
-    showToast("Страва видалена з улюблених!");
-  } catch (error) {
-    console.error("Error deleting favorite:", error);
-    alert("Помилка видалення страви");
-  }
-}
-
 // Render functions
 function renderSubscriptions(subscriptions) {
-  elements.subscriptionsList.innerHTML = subscriptions.length > 0 
-    ? subscriptions.map(sub => `
-        <div class="modal-list-item subscription-item ${sub.active ? 'active' : ''}">
-          <strong>${sub.name || 'Підписка'}</strong>
-          <div class="status">${sub.description || 'Активна'}</div>
-          ${sub.active ? `<div class="benefits" style="margin-top:10px;font-size:14px;color:#666;">
-            ${sub.benefits || '✓ Безкоштовна доставка<br>✓ Знижка 10% на всі страви'}
-          </div>` : ''}
+  const currentSubscription = subscriptions.find(sub => sub.active);
+  
+  elements.subscriptionsList.innerHTML = `
+    ${currentSubscription ? `
+      <div class="current-subscription-status">
+        <div class="status-header">
+          <i class="fas fa-check-circle" style="color: #4CAF50; font-size: 24px;"></i>
+          <h3>Ваша активна підписка</h3>
         </div>
-      `).join('')
-    : '<div class="no-data">У вас немає активних підписок</div>';
+        <div class="status-details">
+          <p><strong>${SUBSCRIPTION_PLANS[currentSubscription.planId].name}</strong></p>
+          <p>Активна до: ${new Date(currentSubscription.expiryDate).toLocaleDateString()}</p>
+          <p>Вартість: ${currentSubscription.price} грн</p>
+          <div class="benefits-list">
+            ${SUBSCRIPTION_PLANS[currentSubscription.planId].benefits.map(benefit => 
+              `<div class="benefit-item"><i class="fas fa-check"></i> ${benefit}</div>`
+            ).join('')}
+          </div>
+        </div>
+      </div>
+    ` : ''}
+    <div class="subscription-plans">
+      ${Object.values(SUBSCRIPTION_PLANS).map(plan => `
+        <div class="subscription-plan ${currentSubscription?.planId === plan.id ? 'active' : ''}">
+          <h3>${plan.name}</h3>
+          <div class="price">${plan.price} грн/міс</div>
+          <div class="benefits">
+            ${plan.benefits.map(benefit => `<div>${benefit}</div>`).join('')}
+          </div>
+          ${currentSubscription?.planId === plan.id ? `
+            <div class="current-plan">
+              <div class="status">Активна підписка</div>
+              <div class="expiry">до ${new Date(currentSubscription.expiryDate).toLocaleDateString()}</div>
+            </div>
+          ` : `
+            <button class="subscribe-btn" onclick="window.showSubscriptionModal('${plan.id}')"
+              ${(currentSubscription?.planId === 'premium' && plan.id === 'basic') ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+              ${currentSubscription ? 
+                (currentSubscription.planId === 'basic' && plan.id === 'premium' ? 'Покращити до Premium' : 'Оформити підписку') 
+                : 'Оформити підписку'}
+            </button>
+          `}
+        </div>
+      `).join('')}
+    </div>
+  `;
 }
 
 function renderOrders(orders) {
@@ -426,7 +463,6 @@ function renderOrders(orders) {
     : '<div class="no-data">У вас немає історії замовлень</div>';
 }
 
-// Оновлена функція renderWallets
 function renderWallets(wallets) {
   elements.walletsList.innerHTML = wallets.length > 0
     ? wallets.map(wallet => `
@@ -435,8 +471,13 @@ function renderWallets(wallets) {
             <div class="wallet-name">${wallet.name || 'Гаманець'}</div>
             <div class="wallet-balance">${wallet.balance || 0} грн</div>
           </div>
-          <div class="wallet-actions" style="margin-left: auto;">
-            <button class="delete-wallet" data-id="${wallet.id}" style="background: none; border: none; color: #ff4444; cursor: pointer;">
+          <div class="wallet-actions" style="display: flex; gap: 10px;">
+            <button class="top-up-btn" onclick="showTopUpModal('${wallet.id}', ${wallet.balance || 0})" 
+              style="background: #4CAF50; color: white; border: none; padding: 8px 16px; border-radius: 20px; cursor: pointer;">
+              <i class="fas fa-plus"></i> Поповнити
+            </button>
+            <button class="delete-wallet" data-id="${wallet.id}" 
+              style="background: none; border: none; color: #ff4444; cursor: pointer;">
               <i class="fas fa-trash"></i> Видалити
             </button>
           </div>
@@ -444,7 +485,7 @@ function renderWallets(wallets) {
       `).join('')
     : '<div class="no-data">У вас немає гаманців</div>';
   
-  // Додаємо обробники подій для кнопок видалення
+  // Add event listeners for delete buttons
   document.querySelectorAll('.delete-wallet').forEach(btn => {
     btn.addEventListener('click', async (e) => {
       const walletId = e.currentTarget.getAttribute('data-id');
@@ -453,7 +494,6 @@ function renderWallets(wallets) {
   });
 }
 
-// Оновлена функція renderFavorites
 function renderFavorites(favorites) {
   elements.favoritesList.innerHTML = favorites.length > 0
     ? favorites.map(fav => `
@@ -615,6 +655,473 @@ function setupBackArrow() {
 
 // Викликаємо функцію налаштування стрілки
 setupBackArrow();
+
+// Make subscription functions globally available
+window.showSubscriptionModal = showSubscriptionModal;
+window.selectDuration = selectDuration;
+window.purchaseSubscription = purchaseSubscription;
+
+// Update showSubscriptionModal function to use proper onclick handlers
+async function showSubscriptionModal(planId) {
+  // Check for active subscription first
+  if (window.activeSubscription) {
+    if (window.activeSubscription.planId === planId) {
+      alert('У вас вже є активна підписка цього типу');
+      return;
+    } else if (window.activeSubscription.planId === 'premium' && planId === 'basic') {
+      alert('Ви не можете перейти з преміум на базову підписку. Дочекайтесь закінчення поточної підписки.');
+      return;
+    }
+  }
+
+  const plan = SUBSCRIPTION_PLANS[planId];
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.id = 'subscriptionDetailsModal';
+  
+  modal.innerHTML = `
+    <div class="modal-content">
+      <span class="close-btn" onclick="document.getElementById('subscriptionDetailsModal').remove()">&times;</span>
+      <h2>Оформлення ${plan.name}</h2>
+      ${window.activeSubscription ? `
+        <div class="upgrade-notice" style="background: #fff3cd; color: #856404; padding: 10px; border-radius: 8px; margin-bottom: 20px;">
+          <i class="fas fa-info-circle"></i>
+          Ви переходите з ${SUBSCRIPTION_PLANS[window.activeSubscription.planId].name} на ${plan.name}.
+          Невикористані дні поточної підписки будуть враховані при розрахунку вартості.
+        </div>
+      ` : ''}
+      <div class="subscription-details">
+        <h3>Виберіть тривалість підписки:</h3>
+        <div class="duration-options">
+          ${SUBSCRIPTION_DURATIONS.map(duration => `
+            <div class="duration-option" onclick="window.selectDuration(this, ${duration.months}, ${plan.price * duration.multiplier})">
+              <div class="duration-name">${duration.name}</div>
+              <div class="duration-price">${Math.round(plan.price * duration.multiplier)} грн</div>
+              ${duration.months > 1 ? `<div class="savings">Економія ${Math.round(100 - (100 * duration.multiplier / duration.months))}%</div>` : ''}
+            </div>
+          `).join('')}
+        </div>
+        <div class="total-section">
+          <div class="total-label">До сплати:</div>
+          <div class="total-amount" id="subscriptionTotal">0 грн</div>
+        </div>
+        <button class="save-btn" onclick="window.purchaseSubscription('${planId}')">
+          ${window.activeSubscription ? 'Змінити підписку' : 'Оформити підписку'}
+        </button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+}
+
+// Handle duration selection
+function selectDuration(element, months, price) {
+  document.querySelectorAll('.duration-option').forEach(opt => opt.classList.remove('selected'));
+  element.classList.add('selected');
+  document.getElementById('subscriptionTotal').textContent = `${price} грн`;
+  window.selectedDuration = months;
+  window.selectedPrice = price;
+}
+
+// Purchase subscription
+async function purchaseSubscription(planId) {
+  if (!window.selectedDuration || !window.selectedPrice) {
+    alert('Будь ласка, виберіть тривалість підписки');
+    return;
+  }
+
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    // Check for active subscription
+    const activeSubQuery = query(
+      collection(db, "subscriptions"),
+      where("userId", "==", user.uid),
+      where("active", "==", true)
+    );
+    const activeSubSnapshot = await getDocs(activeSubQuery);
+
+    if (!activeSubSnapshot.empty) {
+      const currentSub = activeSubSnapshot.docs[0].data();
+      if (currentSub.planId === planId) {
+        alert('У вас вже є активна підписка цього типу');
+        return;
+      }
+    }
+
+    // Get user's wallet
+    const walletsSnapshot = await getDocs(
+      query(collection(db, "wallets"), 
+            where("userEmail", "==", user.email))
+    );
+
+    if (walletsSnapshot.empty) {
+      alert('У вас немає гаманця. Спочатку створіть гаманець.');
+      hideModal(document.getElementById('subscriptionDetailsModal'));
+      showModal(elements.walletsModal);
+      return;
+    }
+
+    // Get wallet with highest balance
+    let bestWallet = null;
+    let bestWalletRef = null;
+    walletsSnapshot.forEach(doc => {
+      const wallet = doc.data();
+      if (!bestWallet || wallet.balance > bestWallet.balance) {
+        bestWallet = wallet;
+        bestWalletRef = doc.ref;
+      }
+    });
+
+    if (!bestWallet || bestWallet.balance < window.selectedPrice) {
+      alert(`Недостатньо коштів на балансі. Необхідно: ${window.selectedPrice} грн`);
+      return;
+    }
+
+    // Calculate expiry date
+    const now = new Date();
+    const expiryDate = new Date(now.setMonth(now.getMonth() + window.selectedDuration));
+
+    // Create subscription
+    const subscriptionData = {
+      userEmail: user.email,
+      userId: user.uid,
+      planId: planId,
+      planName: SUBSCRIPTION_PLANS[planId].name,
+      startDate: new Date(),
+      expiryDate: expiryDate,
+      price: window.selectedPrice,
+      duration: window.selectedDuration,
+      active: true,
+      benefits: SUBSCRIPTION_PLANS[planId].benefits
+    };
+
+    // Deactivate current subscription if exists
+    if (!activeSubSnapshot.empty) {
+      await updateDoc(activeSubSnapshot.docs[0].ref, { active: false });
+    }
+
+    // Update wallet balance
+    await updateDoc(bestWalletRef, {
+      balance: bestWallet.balance - window.selectedPrice
+    });
+
+    // Save new subscription
+    const newSubRef = await addDoc(collection(db, "subscriptions"), subscriptionData);
+    
+    // Update local state
+    window.activeSubscription = {
+      id: newSubRef.id,
+      ...subscriptionData
+    };
+
+    // Close modal and update UI
+    document.getElementById('subscriptionDetailsModal').remove();
+    await loadSubscriptions();
+    await loadWallets();
+    
+    showToast('Підписку успішно оформлено!');
+  } catch (error) {
+    console.error("Error purchasing subscription:", error);
+    alert('Помилка при оформленні підписки: ' + error.message);
+  }
+}
+
+// Update subscription badge
+function updateSubscriptionBadge() {
+  const subscriptionBtn = document.getElementById('subscriptionsBtn');
+  if (!subscriptionBtn) return;
+
+  if (window.activeSubscription) {
+    const plan = SUBSCRIPTION_PLANS[window.activeSubscription.planId];
+    if (!plan) return;
+
+    subscriptionBtn.innerHTML = `
+      <i class="fas fa-crown menu-icon" style="color: #FFD700;"></i>
+      <span>
+        ${plan.name}
+        <div style="font-size: 12px; color: #4CAF50;">Активна до ${new Date(window.activeSubscription.expiryDate).toLocaleDateString()}</div>
+      </span>
+      <i class="fas fa-chevron-right"></i>
+    `;
+  } else {
+    subscriptionBtn.innerHTML = `
+      <i class="fas fa-crown menu-icon"></i>
+      <span>Підписки</span>
+      <i class="fas fa-chevron-right"></i>
+    `;
+  }
+}
+
+// Add CSS styles for subscription status
+const style = document.createElement('style');
+style.textContent = `
+  .current-subscription-status {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 2px solid #4CAF50;
+  }
+
+  .status-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+
+  .status-header h3 {
+    margin: 0;
+    color: #4CAF50;
+  }
+
+  .status-details {
+    color: #666;
+  }
+
+  .status-details p {
+    margin: 5px 0;
+  }
+
+  .status-details strong {
+    color: #333;
+  }
+`;
+document.head.appendChild(style);
+
+// Add styles for benefits list
+const benefitsStyle = document.createElement('style');
+benefitsStyle.textContent = `
+  .benefits-list {
+    margin-top: 15px;
+  }
+  
+  .benefit-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+    color: #666;
+  }
+  
+  .benefit-item i {
+    color: #4CAF50;
+  }
+  
+  .upgrade-notice {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .upgrade-notice i {
+    font-size: 20px;
+  }
+`;
+document.head.appendChild(benefitsStyle);
+
+// Handle adding a new wallet
+async function handleAddWallet(e) {
+  e.preventDefault();
+  
+  const name = document.getElementById('walletName').value.trim();
+  const balance = parseFloat(document.getElementById('walletBalance').value) || 0;
+  
+  if (!name) {
+    alert("Будь ласка, введіть назву гаманця");
+    return;
+  }
+
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    const walletData = {
+      name,
+      balance,
+      userEmail: user.email,
+      userId: user.uid,
+      createdAt: new Date()
+    };
+    
+    // Add to Firestore
+    await addDoc(collection(db, "wallets"), walletData);
+    
+    // Reload wallets
+    await loadWallets();
+    hideModal(elements.addWalletModal);
+    showToast("Гаманець успішно додано!");
+    elements.walletForm.reset();
+  } catch (error) {
+    console.error("Error adding wallet:", error);
+    alert(`Помилка додавання гаманця: ${error.message}`);
+  }
+}
+
+// Delete wallet function
+async function deleteWallet(walletId) {
+  if (!confirm("Ви впевнені, що хочете видалити цей гаманець?")) return;
+  
+  try {
+    await deleteDoc(doc(db, "wallets", walletId));
+    await loadWallets();
+    showToast("Гаманець видалено!");
+  } catch (error) {
+    console.error("Error deleting wallet:", error);
+    alert("Помилка видалення гаманця");
+  }
+}
+
+// Add wallet top-up functions
+async function handleTopUpWallet(walletId, amount) {
+  if (!amount || amount <= 0) {
+    alert('Будь ласка, введіть коректну суму');
+    return;
+  }
+
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const walletRef = doc(db, "wallets", walletId);
+    const walletSnap = await getDoc(walletRef);
+    
+    if (!walletSnap.exists()) {
+      alert('Гаманець не знайдено');
+      return;
+    }
+
+    const currentBalance = walletSnap.data().balance || 0;
+    await updateDoc(walletRef, {
+      balance: currentBalance + amount,
+      lastTopUp: new Date(),
+      lastTopUpAmount: amount
+    });
+
+    await loadWallets();
+    document.getElementById('topUpWalletModal').remove();
+    showToast(`Баланс поповнено на ${amount} грн`);
+  } catch (error) {
+    console.error("Error topping up wallet:", error);
+    alert('Помилка при поповненні балансу');
+  }
+}
+
+function showTopUpModal(walletId, currentBalance) {
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.id = 'topUpWalletModal';
+  
+  modal.innerHTML = `
+    <div class="modal-content">
+      <span class="close-btn" onclick="document.getElementById('topUpWalletModal').remove()">&times;</span>
+      <h2>Поповнення гаманця</h2>
+      <div class="current-balance">
+        <p>Поточний баланс: <strong>${currentBalance} грн</strong></p>
+      </div>
+      <div class="top-up-options">
+        <h3>Оберіть суму поповнення:</h3>
+        <div class="amount-options">
+          <button onclick="selectAmount(100)">100 грн</button>
+          <button onclick="selectAmount(200)">200 грн</button>
+          <button onclick="selectAmount(500)">500 грн</button>
+          <button onclick="selectAmount(1000)">1000 грн</button>
+        </div>
+        <div class="custom-amount">
+          <label for="customAmount">Інша сума:</label>
+          <input type="number" id="customAmount" min="1" step="1" placeholder="Введіть суму">
+        </div>
+      </div>
+      <button class="save-btn" onclick="handleTopUpWallet('${walletId}', Number(document.getElementById('customAmount').value))">
+        Поповнити
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  modal.style.display = 'flex';
+
+  // Add styles for top up modal
+  const style = document.createElement('style');
+  style.textContent = `
+    .current-balance {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+    
+    .amount-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin: 15px 0;
+    }
+    
+    .amount-options button {
+      padding: 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .amount-options button:hover {
+      border-color: #2196F3;
+    }
+    
+    .amount-options button.selected {
+      background: #2196F3;
+      color: white;
+      border-color: #2196F3;
+    }
+    
+    .custom-amount {
+      margin: 15px 0;
+    }
+    
+    .custom-amount input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      margin-top: 5px;
+    }
+    
+    .custom-amount input:focus {
+      border-color: #2196F3;
+      outline: none;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function selectAmount(amount) {
+  const customAmount = document.getElementById('customAmount');
+  if (customAmount) {
+    customAmount.value = amount;
+  }
+  
+  // Update button styles
+  const buttons = document.querySelectorAll('.amount-options button');
+  buttons.forEach(btn => {
+    if (Number(btn.textContent.replace(/[^0-9]/g, '')) === amount) {
+      btn.classList.add('selected');
+    } else {
+      btn.classList.remove('selected');
+    }
+  });
+}
+
+// Make functions globally available
+window.showTopUpModal = showTopUpModal;
+window.handleTopUpWallet = handleTopUpWallet;
+window.selectAmount = selectAmount;
 
 // Initialize the app
 document.addEventListener('DOMContentLoaded', init);

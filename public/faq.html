@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Часті запитання - Дрібка Смаку</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <nav class="nav-bar">
+            <button class="back-btn" onclick="window.location.href='index.html'">← Назад</button>
+            <div class="nav-items">
+        
+                <a href="order.html" class="cart-link">
+                    <img src="images/cart.png" alt="Кошик" class="cart-icon">
+                </a>
+                <div id="authSection">
+                    <div class="auth-buttons">
+                        <a href="login.html" class="btn">Увійти</a>
+                        <a href="register.html" class="btn">Реєстрація</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="faq-content">
+            <div class="faq-hero">
+                <h1>Часті запитання</h1>
+                <p class="subtitle">Відповіді на найпоширеніші запитання</p>
+            </div>
+
+            <section class="faq-section">
+                <div class="faq-category">
+                    <h2>Замовлення</h2>
+                    <div class="faq-item">
+                        <h3>Як зробити замовлення?</h3>
+                        <p>Оберіть ресторан, додайте бажані страви до кошика, вкажіть адресу доставки та спосіб оплати. Після підтвердження замовлення ви отримаєте повідомлення з деталями.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Який мінімальний час доставки?</h3>
+                        <p>Стандартний час доставки становить 30-60 хвилин, залежно від завантаженості та відстані.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Чи можна відстежити своє замовлення?</h3>
+                        <p>Так, після оформлення замовлення ви отримаєте посилання для відстеження статусу доставки в реальному часі.</p>
+                    </div>
+                </div>
+
+                <div class="faq-category">
+                    <h2>Оплата</h2>
+                    <div class="faq-item">
+                        <h3>Які способи оплати доступні?</h3>
+                        <p>Ми приймаємо оплату картою онлайн, готівкою при отриманні та через Apple Pay/Google Pay.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Чи є мінімальна сума замовлення?</h3>
+                        <p>Мінімальна сума замовлення залежить від конкретного ресторану та вказана на сторінці закладу.</p>
+                    </div>
+                </div>
+
+                <div class="faq-category">
+                    <h2>Доставка</h2>
+                    <div class="faq-item">
+                        <h3>Яка вартість доставки?</h3>
+                        <p>Вартість доставки залежить від відстані. При замовленні від 500₴ доставка безкоштовна.</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>У які райони здійснюється доставка?</h3>
+                        <p>Ми доставляємо у всі райони міста. Конкретну зону доставки можна перевірити при оформленні замовлення.</p>
+                    </div>
+                </div>
+
+                <div class="faq-category">
+                    <h2>Інше</h2>
+                    <div class="faq-item">
+                        <h3>Як стати партнером?</h3>
+                        <p>Для партнерства заповніть форму на сайті або зв'яжіться з нами за контактними даними в розділі "Зв'язатися з нами".</p>
+                    </div>
+                    <div class="faq-item">
+                        <h3>Що робити, якщо виникли проблеми з замовленням?</h3>
+                        <p>Зверніться до нашої служби підтримки, яка працює цілодобово. Ми допоможемо вирішити будь-яке питання.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script type="module">
+        import { auth, db } from './firebase-config.js';
+        import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth.js';
+        import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js';
+
+        function updateUserProfile(user, userData) {
+            const authSection = document.getElementById('authSection');
+            const photoURL = userData.photoURL || user.photoURL || 'images/profile.png';
+            
+            authSection.innerHTML = `
+                <a href="profile.html" class="profile-link">
+                    <img src="${photoURL}" alt="Profile" class="profile-icon" title="${user.displayName || user.email}" />
+                </a>
+            `;
+        }
+
+        function checkAuthState() {
+            onAuthStateChanged(auth, async (user) => {
+                const authSection = document.getElementById('authSection');
+                
+                if (!user) {
+                    authSection.innerHTML = `
+                        <div class="auth-buttons">
+                            <a href="login.html" class="btn btn-outline">Увійти</a>
+                            <a href="register.html" class="btn">Реєстрація</a>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                try {
+                    const userRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(userRef);
+                    
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        updateUserProfile(user, userData);
+                    } else {
+                        updateUserProfile(user, {});
+                    }
+                } catch (error) {
+                    console.error("Помилка завантаження даних користувача:", error);
+                    updateUserProfile(user, {});
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', checkAuthState);
+    </script>
+</body>
+</html> 
