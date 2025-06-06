@@ -397,37 +397,37 @@ const banners = [
   {
     title: "Спробуйте нові сніданки в Daily Dose",
     subtitle: "Спеціальна пропозиція",
-    buttonText: "Замовити",
+    buttonText: "Замовляйте прямо зараз!",
     bgColor: "#FFE8E8",
-    image: "images/banner1.jpg"
+    image: "images/banner3.jpg"
   },
   {
     title: "Доставка улюблених страв",
-    subtitle: "Отримайте знижку 20%",
+    subtitle: "Отримуйте 10% знижку на перше замовлення за промокодом!",
     buttonText: "Дізнатись більше",
-    bgColor: "#FFF3E0",
-    image: "images/banner2.jpg"
-  },
-  {
-    title: "Святкові страви",
-    subtitle: "Замовляйте заздалегідь",
-    buttonText: "Переглянути меню",
-    bgColor: "#E8F5E9",
-    image: "images/banner3.jpg"
+    bgColor: "#FFF8DC",
+    image: "images/banner4.jpg"
   }
 ];
 
-// Створюємо HTML для банерів
-function createBannerHTML() {
+// Ініціалізація каруселі банерів
+function initBannerCarousel() {
+  console.log('Initializing banner carousel...');
   const container = document.querySelector('.banner-carousel');
-  if (!container) return;
+  if (!container) {
+    console.error('Banner carousel container not found');
+    return;
+  }
 
-  const track = document.createElement('div');
-  track.className = 'banner-track';
+  // Очищаємо контейнер перед додаванням нових слайдів
+  container.innerHTML = '';
 
-  banners.forEach(banner => {
+  // Створюємо слайди
+  banners.forEach((banner, index) => {
+    console.log(`Creating banner slide ${index + 1}:`, banner);
     const slide = document.createElement('div');
     slide.className = 'banner-slide';
+    slide.style.display = index === 0 ? 'flex' : 'none';
     slide.style.backgroundColor = banner.bgColor;
 
     slide.innerHTML = `
@@ -436,14 +436,13 @@ function createBannerHTML() {
         <p>${banner.subtitle}</p>
         <button class="banner-btn">${banner.buttonText}</button>
       </div>
-      <div class="banner-image">
-        <img src="${banner.image}" alt="${banner.title}">
-      </div>
+      <img src="${banner.image}" alt="${banner.title}">
     `;
 
-    track.appendChild(slide);
+    container.appendChild(slide);
   });
 
+  // Додаємо навігаційні кнопки
   const prevBtn = document.createElement('button');
   prevBtn.className = 'banner-nav prev';
   prevBtn.innerHTML = '❮';
@@ -452,47 +451,59 @@ function createBannerHTML() {
   nextBtn.className = 'banner-nav next';
   nextBtn.innerHTML = '❯';
 
-  container.appendChild(track);
   container.appendChild(prevBtn);
   container.appendChild(nextBtn);
 
-  return { track, prevBtn, nextBtn };
-}
-
-// Ініціалізація каруселі банерів
-function initBannerCarousel() {
-  const elements = createBannerHTML();
-  if (!elements) return;
-
-  const { track, prevBtn, nextBtn } = elements;
   let currentSlide = 0;
+  const totalSlides = banners.length;
+  console.log('Total slides:', totalSlides);
 
-  function updateSlide() {
-    const slideWidth = track.querySelector('.banner-slide').offsetWidth;
-    track.style.transform = `translateX(-${currentSlide * slideWidth}px)`;
+  // Функція для показу слайду
+  function showSlide(index) {
+    console.log('Showing slide:', index);
+    const slides = container.querySelectorAll('.banner-slide');
+    slides.forEach((slide, i) => {
+      slide.style.display = i === index ? 'flex' : 'none';
+    });
   }
 
-  function nextSlide() {
-    currentSlide = (currentSlide + 1) % banners.length;
-    updateSlide();
-  }
-
-  function prevSlide() {
-    currentSlide = (currentSlide - 1 + banners.length) % banners.length;
-    updateSlide();
-  }
-
-  nextBtn.addEventListener('click', nextSlide);
-  prevBtn.addEventListener('click', prevSlide);
-
-  let autoplay = setInterval(nextSlide, 5000);
-
-  track.addEventListener('mouseenter', () => clearInterval(autoplay));
-  track.addEventListener('mouseleave', () => {
-    autoplay = setInterval(nextSlide, 5000);
+  // Обробники для кнопок
+  nextBtn.addEventListener('click', () => {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    console.log('Next slide:', currentSlide);
+    showSlide(currentSlide);
   });
 
-  window.addEventListener('resize', updateSlide);
+  prevBtn.addEventListener('click', () => {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    console.log('Previous slide:', currentSlide);
+    showSlide(currentSlide);
+  });
+
+  // Автоматична зміна слайдів
+  let autoplay = setInterval(() => {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    showSlide(currentSlide);
+  }, 5000);
+
+  // Зупиняємо автоматичну зміну при наведенні
+  container.addEventListener('mouseenter', () => {
+    console.log('Mouse enter - stopping autoplay');
+    clearInterval(autoplay);
+  });
+
+  container.addEventListener('mouseleave', () => {
+    console.log('Mouse leave - starting autoplay');
+    autoplay = setInterval(() => {
+      currentSlide = (currentSlide + 1) % totalSlides;
+      showSlide(currentSlide);
+    }, 5000);
+  });
+
+  // Показуємо перший слайд
+  showSlide(0);
+  console.log('Banner carousel initialized');
 }
 
+// Викликаємо ініціалізацію при завантаженні сторінки
 document.addEventListener('DOMContentLoaded', initBannerCarousel);
