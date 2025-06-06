@@ -85,29 +85,23 @@
 
     <!-- Фільтри -->
     <div class="filters">
-      <select id="sort">
-        <option value="">Сортування</option>
+      <select id="sort-select">
         <option value="rating">За рейтингом</option>
-        <option value="delivery">За швидкістю доставки</option>
+        <option value="delivery">За часом доставки</option>
+        <option value="price_low">Ціна: від дешевших</option>
+        <option value="price_high">Ціна: від дорожчих</option>
       </select>
 
-      <select id="filter">
-        <option value="">Фільтр</option>
-        <option value="веганське">Веганське</option>
-        <option value="халяль">Халяль</option>
-        <option value="без глютену">Без глютену</option>
+      <select id="price-select">
+        <option value="all">Усі ціни</option>
+        <option value="cheap">До 150 грн</option>
+        <option value="medium">150-250 грн</option>
+        <option value="expensive">Від 250 грн</option>
       </select>
 
-      <select id="price">
-        <option value="">Ціна</option>
-        <option value="low">До 150 грн</option>
-        <option value="medium">150–300 грн</option>
-        <option value="high">300+ грн</option>
-      </select>
-
-      <select id="promo">
-        <option value="">Усі пропозиції</option>
-        <option value="yes">Тільки з акціями</option>
+      <select id="promo-select">
+        <option value="all">Усі заклади</option>
+        <option value="promo">Тільки з акціями</option>
       </select>
 
       <button id="reset-filters" class="btn-reset">Скинути фільтри</button>
@@ -286,126 +280,7 @@
     <section class="all-places">
       <h2>Усі заклади</h2>
       <div class="restaurants">
-        <a href="menu.html?id=1" class="restaurant-link">
-          <div class="restaurant">
-            <div class="rating-badge">4.8</div>
-            <img src="images/daily_dose.png" alt="Daily Dose"/>
-            <div class="card-content">
-              <div class="card-content-left">
-                <p>Daily Dose</p>
-                <div class="card-info">
-                  <span class="cuisine-type">Азіатська</span>
-                  <span class="delivery-time">25-35 хв</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="menu.html?id=2" class="restaurant-link">
-          <div class="restaurant">
-            <div class="rating-badge">4.6</div>
-            <img src="images/kolos.png" alt="Kolos"/>
-            <div class="card-content">
-              <div class="card-content-left">
-                <p>Kolos</p>
-                <div class="card-info">
-                  <span class="cuisine-type">Українська</span>
-                  <span class="delivery-time">30-45 хв</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="menu.html?id=3" class="restaurant-link">
-          <div class="restaurant">
-            <div class="rating-badge">4.9</div>
-            <img src="images/una_pinsa.png" alt="Una Pinsa"/>
-            <div class="card-content">
-              <div class="card-content-left">
-                <p>Una Pinsa</p>
-                <div class="card-info">
-                  <span class="cuisine-type">Італійська</span>
-                  <span class="delivery-time">20-35 хв</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="menu.html?id=4" class="restaurant-link">
-          <div class="restaurant">
-            <div class="rating-badge">4.7</div>
-            <img src="images/levova_paliantysia.png" alt="Levova Paliantysia"/>
-            <div class="card-content">
-              <div class="card-content-left">
-                <p>Levova Paliantysia</p>
-                <div class="card-info">
-                  <span class="cuisine-type">Випічка</span>
-                  <span class="delivery-time">15-25 хв</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="menu.html?id=5" class="restaurant-link">
-          <div class="restaurant">
-            <div class="rating-badge">4.5</div>
-            <img src="images/burger_star.jpg" alt="Burger Star"/>
-            <div class="card-content">
-              <div class="card-content-left">
-                <p>Burger Star</p>
-                <div class="card-info">
-                  <span class="cuisine-type">Бургери</span>
-                  <span class="delivery-time">25-40 хв</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="menu.html?id=6" class="restaurant-link">
-          <div class="restaurant">
-            <div class="rating-badge">4.7</div>
-            <img src="images/shoco.jpg" alt="SHOco"/>
-            <div class="card-content">
-              <div class="card-content-left">
-                <p>SHOco</p>
-                <div class="card-info">
-                  <span class="cuisine-type">Десерти</span>
-                  <span class="delivery-time">20-30 хв</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="menu.html?id=7" class="restaurant-link">
-          <div class="restaurant">
-            <div class="rating-badge">4.8</div>
-            <img src="images/noa.webp" alt="Noa"/>
-            <div class="card-content">
-              <div class="card-content-left">
-                <p>Noa</p>
-                <div class="card-info">
-                  <span class="cuisine-type">Суші</span>
-                  <span class="delivery-time">40-55 хв</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
-        <a href="menu.html?id=8" class="restaurant-link">
-          <div class="restaurant">
-            <div class="rating-badge">4.6</div>
-            <img src="images/pasta_fresca.jpeg" alt="Pasta Fresca"/>
-            <div class="card-content">
-              <div class="card-content-left">
-                <p>Pasta Fresca</p>
-                <div class="card-info">
-                  <span class="cuisine-type">Італійська</span>
-                  <span class="delivery-time">30-45 хв</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </a>
+        <!-- Тут будуть динамічно додані ресторани -->
       </div>
     </section>
 
@@ -503,6 +378,7 @@
 
     document.addEventListener('DOMContentLoaded', checkAuthState);
   </script>
+  <script src="js/script.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

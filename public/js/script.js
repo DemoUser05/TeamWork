@@ -1,75 +1,291 @@
-let selectedCity = null; // або null, або "Київ", "Львів", "Одеса"
+let searchQuery = '';
 
 const restaurants = [
-  { id: "1", name: "Daily Dose", category: [,"бургер", "салат", "піца", "паста"], city: ["Львів", "Дрогобич", "Черкаси"], rating: 4.9, deliveryTime: 20, avgPrice: 220, tags: ["веганське", "без глютену"], promo: true, img: "images/daily_dose.png" },
-  { id: "2", name: "Kolos", category: ["сніданок", "напої", "салат", "напої", "кексик"], city: ["Львів", "Дрогобич"] ,rating: 4.3, deliveryTime: 45, avgPrice: 300, tags: ["халяль"], promo: false, img: "images/kolos.png" },
+  { id: "1", name: "Daily Dose", category: ["бургер", "салат", "піца", "паста"], city: ["Львів", "Дрогобич", "Черкаси"], rating: 4.9, deliveryTime: 20, avgPrice: 220, tags: ["веганське", "без глютену"], promo: true, img: "images/daily_dose.png" },
+  { id: "2", name: "Kolos", category: ["сніданок", "напої", "салат", "кексик"], city: ["Львів", "Дрогобич"], rating: 4.3, deliveryTime: 45, avgPrice: 300, tags: ["халяль"], promo: false, img: "images/kolos.png" },
   { id: "3", name: "Una Pinsa", category: ["піца", "сніданок", "паста"], city: "Львів", rating: 4.4, deliveryTime: 35, avgPrice: 170, tags: ["без глютену", "халяль"], promo: true, img: "images/una_pinsa.png" },
   { id: "4", name: "Levova Paliantysia", category: ["салат", "піца", "сніданок", "напої"], city: "Львів", rating: 4.7, deliveryTime: 25, avgPrice: 120, tags: ["халяль"], promo: false, img: "images/levova_paliantysia.png" },
-
-  { id: "5", name: "Burger Star", category: ["бургер","напої", "салат", "фастфуд"], city: "Черкаси", rating: 4.7, deliveryTime: 30, avgPrice: 200, tags: [], promo: true, img: "images/burger_star.jpg" },
-  { id: "6", name: "SHOco", category: ["кексик", "напої"], city: "Львів",  promo: false, rating: 4.2, deliveryTime: 50, avgPrice: 160, tags: ["без глютену", "веганське"], img: "images/shoco.jpeg" },
+  { id: "5", name: "Burger Star", category: ["бургер", "напої", "салат", "фастфуд"], city: "Черкаси", rating: 4.7, deliveryTime: 30, avgPrice: 200, tags: [], promo: true, img: "images/burger_star.jpg" },
+  { id: "6", name: "SHOco", category: ["кексик", "напої"], city: "Львів", promo: false, rating: 4.2, deliveryTime: 50, avgPrice: 160, tags: ["без глютену", "веганське"], img: "images/shoco.jpeg" },
   { id: "7", name: "Noa", category: ["суші", "напої", "салат"], city: ["Львів", "Черкаси"], promo: false, rating: 4.8, deliveryTime: 40, avgPrice: 350, tags: ["веганське"], img: "images/noa.webp" },
   { id: "8", name: "Pasta Fresca", category: ["паста", "сніданок", "напої", "кексик"], city: "Дрогобич", promo: true, rating: 3.8, deliveryTime: 45, avgPrice: 210, tags: ["без глютену", "веганське"], img: "images/pasta_fresca.jpeg" },
-
   { id: "9", name: "Trdlo", category: "кексик", city: "Львів", promo: true, rating: 4.7, deliveryTime: 20, avgPrice: 110, tags: [], img: "images/trdlo.png" },
   { id: "10", name: "mcdonalds", category: ["фастфуд", "бургер", "напої", "салат"], city: ["Львів", "Дрогобич", "Черкаси"], promo: false, rating: 4.7, deliveryTime: 30, avgPrice: 190, tags: [], img: "images/mcdonalds.png" },
-  { id: "11", name: "Good Friend", category: ["напої", "піца", "бургер"], city: "Львів",  promo: false, rating: 5.0, deliveryTime: 50, avgPrice: 200, tags: ["халяль"], img: "images/good_friend.jpg" },
-  { id: "12", name: "Sushi King", category: "суші", city: "Львів",  promo: true, rating: 3.7, deliveryTime: 50, avgPrice: 290, tags: ["веганське"], img: "images/sushi_king.jpg" }
+  { id: "11", name: "Good Friend", category: ["напої", "піца", "бургер"], city: "Львів", promo: false, rating: 5.0, deliveryTime: 50, avgPrice: 200, tags: ["халяль"], img: "images/good_friend.jpg" },
+  { id: "12", name: "Sushi King", category: "суші", city: "Львів", promo: true, rating: 3.7, deliveryTime: 50, avgPrice: 290, tags: ["веганське"], img: "images/sushi_king.jpg" }
 ];
 
-document.getElementById("city-select").addEventListener("change", (e) => {
-  const city = e.target.value;
-  selectedCity = city === "" ? null : city;
-  applyFilters();
-});
+// Глобальні змінні для фільтрів
+let currentFilters = {
+  category: 'all',
+  priceRange: 'all',
+  sort: 'rating',
+  promoOnly: false
+};
 
-
-function renderRestaurants(data) {
-  const container = document.getElementById("restaurant-list");
-  container.innerHTML = "";
-
-  if (data.length === 0) {
-    container.innerHTML = "<p>Нічого не знайдено</p>";
+// Функція для рендерингу ресторанів
+function renderRestaurants(restaurantsToRender) {
+  const container = document.querySelector('.restaurants');
+  if (!container) {
+    console.error('Container .restaurants not found');
     return;
   }
-
-  data.forEach(r => {
-    const div = document.createElement("div");
-    div.className = "restaurant";
-    div.innerHTML = `
-     <a href="menu.html?id=${r.id}" class="restaurant-link">
-      <img src="${r.img}" />
-      <p>${r.name}</p>
-     </a>
-`;
-
-    container.appendChild(div);
+  
+  container.innerHTML = '';
+  
+  if (restaurantsToRender.length === 0) {
+    container.innerHTML = '<p style="text-align: center; width: 100%; padding: 20px;">Нічого не знайдено</p>';
+    return;
+  }
+  
+  restaurantsToRender.forEach(restaurant => {
+    const restaurantElement = document.createElement('a');
+    restaurantElement.href = `menu.html?id=${restaurant.id}`;
+    restaurantElement.className = 'restaurant-link';
+    
+    restaurantElement.innerHTML = `
+      <div class="restaurant">
+        <div class="rating-badge">${restaurant.rating}</div>
+        <img src="${restaurant.img}" alt="${restaurant.name}"/>
+        <div class="card-content">
+          <div class="card-content-left">
+            <p>${restaurant.name}</p>
+            <div class="card-info">
+              <span class="cuisine-type">${Array.isArray(restaurant.category) ? restaurant.category[0] : restaurant.category}</span>
+              <span class="delivery-time">${restaurant.deliveryTime}-${restaurant.deliveryTime + 15} хв</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    container.appendChild(restaurantElement);
   });
 }
 
-renderRestaurants(restaurants);
+// Функція для рендерингу каруселі популярних ресторанів
+function renderCarousel(restaurantsToRender) {
+  const carouselTrack = document.getElementById('carousel-track');
+  if (!carouselTrack) return;
 
-document.querySelector(".search-bar input").addEventListener("input", function (e) {
-  const query = e.target.value.toLowerCase();
-  const filtered = restaurants.filter(r => r.name.toLowerCase().includes(query));
-  renderRestaurants(filtered);
-});
+  carouselTrack.innerHTML = '';
 
-document.querySelectorAll(".categories button").forEach(btn => {
-  btn.addEventListener("click", function () {
-    const cat = btn.textContent.trim().toLowerCase().split(" ")[1];
-    applyFilters({ category: cat }); // Передаємо категорію
-  });
-});
-
-
-document.querySelectorAll(".filters select")[3].addEventListener("change", function (e) {
-  if (e.target.value.toLowerCase().includes("знижка") || e.target.value.toLowerCase().includes("доставка")) {
-    renderRestaurants(restaurants.filter(r => r.promo));
-  } else {
-    renderRestaurants(restaurants);
+  if (restaurantsToRender.length === 0) {
+    carouselTrack.innerHTML = '<p style="text-align: center; width: 100%; padding: 20px;">Нічого не знайдено</p>';
+    return;
   }
-});
+
+  // Групуємо ресторани по 3 для слайдів
+  const slides = [];
+  for (let i = 0; i < restaurantsToRender.length; i += 3) {
+    slides.push(restaurantsToRender.slice(i, i + 3));
+  }
+
+  slides.forEach(slideRestaurants => {
+    const slide = document.createElement('div');
+    slide.className = 'carousel-slide';
+
+    slideRestaurants.forEach(restaurant => {
+      const restaurantElement = document.createElement('a');
+      restaurantElement.href = `menu.html?id=${restaurant.id}`;
+      restaurantElement.className = 'restaurant-link';
+
+      restaurantElement.innerHTML = `
+        <div class="card">
+          <div class="rating-badge">${restaurant.rating}</div>
+          <img src="${restaurant.img}" alt="${restaurant.name}"/>
+          <div class="card-content">
+            <div class="card-content-left">
+              <p>${restaurant.name}</p>
+              <div class="card-info">
+                <span class="cuisine-type">${Array.isArray(restaurant.category) ? restaurant.category[0] : restaurant.category}</span>
+                <span class="delivery-time">${restaurant.deliveryTime}-${restaurant.deliveryTime + 15} хв</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      slide.appendChild(restaurantElement);
+    });
+
+    carouselTrack.appendChild(slide);
+  });
+
+  // Оновлюємо карусель після рендерингу
+  currentIndex = 0;
+  updateCarousel();
+}
+
+// Функція для фільтрації та сортування ресторанів
+function filterAndSortRestaurants() {
+  let filtered = [...restaurants];
+  
+  // Фільтрація за категорією
+  if (currentFilters.category !== 'all') {
+    filtered = filtered.filter(restaurant => {
+      const categories = Array.isArray(restaurant.category) ? restaurant.category : [restaurant.category];
+      return categories.includes(currentFilters.category);
+    });
+  }
+  
+  // Фільтрація за ціною
+  if (currentFilters.priceRange !== 'all') {
+    filtered = filtered.filter(restaurant => {
+      switch(currentFilters.priceRange) {
+        case 'cheap':
+          return restaurant.avgPrice <= 150;
+        case 'medium':
+          return restaurant.avgPrice > 150 && restaurant.avgPrice <= 250;
+        case 'expensive':
+          return restaurant.avgPrice > 250;
+        default:
+          return true;
+      }
+    });
+  }
+  
+  // Фільтрація за акціями
+  if (currentFilters.promoOnly) {
+    filtered = filtered.filter(restaurant => restaurant.promo);
+  }
+  
+  // Сортування
+  filtered.sort((a, b) => {
+    switch(currentFilters.sort) {
+      case 'rating':
+        return b.rating - a.rating;
+      case 'delivery':
+        return a.deliveryTime - b.deliveryTime;
+      case 'price_low':
+        return a.avgPrice - b.avgPrice;
+      case 'price_high':
+        return b.avgPrice - a.avgPrice;
+      default:
+        return 0;
+    }
+  });
+  
+  return filtered;
+}
+
+// Функція для оновлення відображення
+function updateDisplay() {
+  const filtered = filterAndSortRestaurants();
+  renderRestaurants(filtered);
+}
+
+// Функція для скидання всіх фільтрів
+function resetFilters() {
+  console.log('Resetting filters...');
+  
+  currentFilters = {
+    category: 'all',
+    priceRange: 'all',
+    sort: 'rating',
+    promoOnly: false
+  };
+  
+  // Скидаємо значення всіх селектів
+  document.querySelector('#sort-select').value = 'rating';
+  document.querySelector('#price-select').value = 'all';
+  document.querySelector('#promo-select').value = 'all';
+  
+  // Знімаємо активний клас з усіх кнопок категорій
+  document.querySelectorAll('.categories button').forEach(button => {
+    button.classList.remove('active');
+  });
+  // Активуємо кнопку "Усі"
+  const allButton = document.querySelector('.categories button:first-child');
+  if (allButton) {
+    allButton.classList.add('active');
+  }
+  
+  // Оновлюємо відображення
+  updateDisplay();
+  console.log('Filters reset complete');
+}
+
+// Ініціалізація при завантаженні сторінки
+function initializePage() {
+  console.log('Initializing page...');
+  
+  // Початковий рендер всіх ресторанів
+  renderRestaurants(restaurants);
+  
+  // Пошук
+  const searchInput = document.querySelector('.search-bar input');
+  if (searchInput) {
+    searchInput.addEventListener('input', (e) => {
+      const query = e.target.value.toLowerCase().trim();
+      const filtered = restaurants.filter(restaurant => 
+        restaurant.name.toLowerCase().includes(query)
+      );
+      renderRestaurants(filtered);
+    });
+  }
+  
+  // Категорії
+  document.querySelectorAll('.categories button').forEach(button => {
+    button.addEventListener('click', (e) => {
+      // Знімаємо активний клас з усіх кнопок
+      document.querySelectorAll('.categories button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      // Додаємо активний клас натиснутій кнопці
+      e.target.classList.add('active');
+      
+      const category = e.target.textContent.toLowerCase().replace('🍔', '').replace('🍣', '')
+        .replace('🍕', '').replace('🍝', '').replace('🍟', '').replace('🧁', '')
+        .replace('🥗', '').replace('🍳', '').replace('🥤', '').trim();
+      
+      currentFilters.category = category === 'усі' ? 'all' : category;
+      updateDisplay();
+    });
+  });
+  
+  // Сортування
+  const sortSelect = document.querySelector('#sort-select');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', (e) => {
+      currentFilters.sort = e.target.value;
+      updateDisplay();
+    });
+  }
+  
+  // Фільтр за ціною
+  const priceSelect = document.querySelector('#price-select');
+  if (priceSelect) {
+    priceSelect.addEventListener('change', (e) => {
+      currentFilters.priceRange = e.target.value;
+      updateDisplay();
+    });
+  }
+  
+  // Фільтр за акціями
+  const promoSelect = document.querySelector('#promo-select');
+  if (promoSelect) {
+    promoSelect.addEventListener('change', (e) => {
+      currentFilters.promoOnly = e.target.value === 'promo';
+      updateDisplay();
+    });
+  }
+  
+  // Кнопка скидання фільтрів
+  const resetButton = document.querySelector('#reset-filters');
+  if (resetButton) {
+    console.log('Reset button found');
+    resetButton.addEventListener('click', () => {
+      console.log('Reset button clicked');
+      resetFilters();
+    });
+  } else {
+    console.error('Reset button not found');
+  }
+}
+
+// Викликаємо ініціалізацію при завантаженні сторінки
+document.addEventListener('DOMContentLoaded', initializePage);
 
 // Carousel functionality
 const track = document.querySelector('.carousel-track');
@@ -79,130 +295,63 @@ const prevButton = document.querySelector('.carousel-btn.left');
 let currentIndex = 0;
 
 function updateCarousel() {
-    const slideWidth = slides[0].getBoundingClientRect().width;
-    track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
+  if (!track) return;
+  const slideWidth = slides.length > 0 ? slides[0].getBoundingClientRect().width : 0;
+  track.style.transform = `translateX(-${currentIndex * slideWidth}px)`;
 }
 
 // Initialize carousel
 if (track && slides.length > 0) {
-    // Set initial position
-    updateCarousel();
+  updateCarousel();
 
-    // Add click handlers for next/prev buttons
-    if (nextButton) {
-        nextButton.addEventListener('click', () => {
-            if (currentIndex < slides.length - 1) {
-                currentIndex++;
-                updateCarousel();
-            }
-        });
+  if (nextButton) {
+    nextButton.addEventListener('click', () => {
+      if (currentIndex < slides.length - 1) {
+        currentIndex++;
+        updateCarousel();
+      }
+    });
+  }
+
+  if (prevButton) {
+    prevButton.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateCarousel();
+      }
+    });
+  }
+
+  window.addEventListener('resize', updateCarousel);
+
+  let touchStartX = 0;
+  let touchEndX = 0;
+
+  track.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+  });
+
+  track.addEventListener('touchmove', (e) => {
+    touchEndX = e.touches[0].clientX;
+  });
+
+  track.addEventListener('touchend', () => {
+    const difference = touchStartX - touchEndX;
+    if (Math.abs(difference) > 50) {
+      if (difference > 0 && currentIndex < slides.length - 1) {
+        currentIndex++;
+        updateCarousel();
+      } else if (difference < 0 && currentIndex > 0) {
+        currentIndex--;
+        updateCarousel();
+      }
     }
-
-    if (prevButton) {
-        prevButton.addEventListener('click', () => {
-            if (currentIndex > 0) {
-                currentIndex--;
-                updateCarousel();
-            }
-        });
-    }
-
-    // Update on window resize
-    window.addEventListener('resize', updateCarousel);
-
-    // Optional: Add touch support
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    track.addEventListener('touchstart', (e) => {
-        touchStartX = e.touches[0].clientX;
-    });
-
-    track.addEventListener('touchmove', (e) => {
-        touchEndX = e.touches[0].clientX;
-    });
-
-    track.addEventListener('touchend', () => {
-        const difference = touchStartX - touchEndX;
-        if (Math.abs(difference) > 50) { // Minimum swipe distance
-            if (difference > 0 && currentIndex < slides.length - 1) {
-                // Swipe left
-                currentIndex++;
-                updateCarousel();
-            } else if (difference < 0 && currentIndex > 0) {
-                // Swipe right
-                currentIndex--;
-                updateCarousel();
-            }
-        }
-    });
+  });
 }
-
-function applyFilters(extra = {}) {
-  const sortBy = document.getElementById("sort").value;
-  const tag = document.getElementById("filter").value;
-  const price = document.getElementById("price").value;
-  const promo = document.getElementById("promo").value;
-  const category = extra.category || null;
-
-  let filtered = [...restaurants];
-
-  // 📍 Фільтр за містом
-  if (selectedCity) {
-    filtered = filtered.filter(r =>
-      Array.isArray(r.city)
-        ? r.city.includes(selectedCity)
-        : r.city === selectedCity
-    );
-  }
-
-  // 🏷️ Теги
-  if (tag) {
-    filtered = filtered.filter(r => r.tags.includes(tag));
-  }
-
-  // 💰 Ціна
-  if (price) {
-    filtered = filtered.filter(r => {
-      if (price === "low") return r.avgPrice <= 150;
-      if (price === "medium") return r.avgPrice > 150 && r.avgPrice <= 300;
-      if (price === "high") return r.avgPrice > 300;
-    });
-  }
-
-  // 🎁 Промо
-  if (promo === "yes") {
-    filtered = filtered.filter(r => r.promo === true);
-  }
-
-  // 🔁 Сортування
-  if (sortBy === "rating") {
-    filtered.sort((a, b) => b.rating - a.rating);
-  } else if (sortBy === "delivery") {
-    filtered.sort((a, b) => a.deliveryTime - b.deliveryTime);
-  }
-
-  // Категорії
-  if (category) {
-    filtered = filtered.filter(r =>
-      Array.isArray(r.category)
-        ? r.category.includes(category)
-        : r.category === category
-    );
-  }
-
-  renderRestaurants(filtered);
-}
-
-
-// 🟰 Прив'язуємо всі селекти
-document.querySelectorAll(".filters select").forEach(sel => {
-  sel.addEventListener("change", applyFilters);
-});
 
 const deliveryBtn = document.getElementById("delivery-btn");
 const pickupBtn = document.getElementById("pickup-btn");
-let deliveryMode = "Доставка"; // або "Самовивіз"
+let deliveryMode = "Доставка";
 
 deliveryBtn.addEventListener("click", () => {
   deliveryBtn.classList.add("active");
@@ -221,14 +370,14 @@ pickupBtn.addEventListener("click", () => {
 document.querySelectorAll(".modal-link").forEach(link => {
   link.addEventListener("click", (e) => {
     e.preventDefault();
-    
     const modal = document.getElementById("modal");
     const title = document.getElementById("modal-title");
     const text = document.getElementById("modal-text");
-    
+
     title.textContent = link.getAttribute("data-title");
-    text.textContent = link.getAttribute("data-text");
-    
+    const formattedText = link.getAttribute("data-text").split("<br><br>").map(line => `<p>${line}</p>`).join("");
+    text.innerHTML = formattedText;
+
     modal.style.display = "flex";
   });
 });
@@ -241,37 +390,6 @@ window.addEventListener("click", (e) => {
   if (e.target === document.getElementById("modal")) {
     document.getElementById("modal").style.display = "none";
   }
-});
-
-document.querySelectorAll(".modal-link").forEach(link => {
-  link.addEventListener("click", (e) => {
-    e.preventDefault();
-
-    const modal = document.getElementById("modal");
-    const title = document.getElementById("modal-title");
-    const text = document.getElementById("modal-text");
-
-    title.textContent = link.getAttribute("data-title");
-    
-    // Заміняємо <br><br> на окремі <p> елементи
-    const formattedText = link.getAttribute("data-text").split("<br><br>").map(line => `<p>${line}</p>`).join("");
-
-    text.innerHTML = formattedText;
-
-    modal.style.display = "flex";
-  });
-});
-
-document.getElementById("reset-filters").addEventListener("click", () => {
-  document.getElementById("sort").value = "";
-  document.getElementById("filter").value = "";
-  document.getElementById("price").value = "";
-  document.getElementById("promo").value = "";
-
-  selectedCity = null;
-  document.getElementById("city-select").value = "";
-  
-  renderRestaurants(restaurants); // Повертає стандартний список ресторанів
 });
 
 // Банери для каруселі
@@ -311,7 +429,7 @@ function createBannerHTML() {
     const slide = document.createElement('div');
     slide.className = 'banner-slide';
     slide.style.backgroundColor = banner.bgColor;
-    
+
     slide.innerHTML = `
       <div class="banner-content">
         <h2>${banner.title}</h2>
@@ -322,18 +440,17 @@ function createBannerHTML() {
         <img src="${banner.image}" alt="${banner.title}">
       </div>
     `;
-    
+
     track.appendChild(slide);
   });
 
-  // Додаємо кнопки навігації
   const prevBtn = document.createElement('button');
   prevBtn.className = 'banner-nav prev';
-  prevBtn.innerHTML = '&#10094;';
+  prevBtn.innerHTML = '❮';
 
   const nextBtn = document.createElement('button');
   nextBtn.className = 'banner-nav next';
-  nextBtn.innerHTML = '&#10095;';
+  nextBtn.innerHTML = '❯';
 
   container.appendChild(track);
   container.appendChild(prevBtn);
@@ -368,18 +485,14 @@ function initBannerCarousel() {
   nextBtn.addEventListener('click', nextSlide);
   prevBtn.addEventListener('click', prevSlide);
 
-  // Автоматична прокрутка
   let autoplay = setInterval(nextSlide, 5000);
 
-  // Зупиняємо автопрокрутку при наведенні
   track.addEventListener('mouseenter', () => clearInterval(autoplay));
   track.addEventListener('mouseleave', () => {
     autoplay = setInterval(nextSlide, 5000);
   });
 
-  // Оновлюємо при зміні розміру вікна
   window.addEventListener('resize', updateSlide);
 }
 
-// Викликаємо ініціалізацію після завантаження сторінки
 document.addEventListener('DOMContentLoaded', initBannerCarousel);
